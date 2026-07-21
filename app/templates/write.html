@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}Write your letter — Janata Ki Baat{% endblock %}
+{% block content %}
+
+<section class="section">
+  <div class="kicker">STEP / 01 — PICK YOUR WORDS</div>
+  <h1 style="margin-top:0">Your letter to the Education Ministry</h1>
+  <p class="small" style="max-width:720px">
+    Three formal letters, drafted to be received, logged and read. Microcopy
+    can joke; <strong>letters never do</strong>. Your name and city go on the
+    letter — that's what makes it yours.
+  </p>
+
+  <div class="write-layout" style="margin-top:30px">
+    <form method="post" action="{{ url_for('public.write_submit') }}" class="form-grid" id="write-form">
+
+      <div class="field">
+        <label>The letter</label>
+        <div class="tpl-pick">
+          {% for t in templates %}
+          <label class="tpl-option {% if picked == t.slug %}checked{% endif %}">
+            <input type="radio" name="template" value="{{ t.slug }}"
+                   {% if picked == t.slug %}checked{% endif %} required>
+            <span>
+              <span class="tpl-title">{{ t.title }}</span><br>
+              <span class="tpl-sub">Subject: {{ t.subject_line }}</span>
+            </span>
+          </label>
+          {% endfor %}
+        </div>
+        {% if errors.template %}<div class="error">{{ errors.template }}</div>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="f-name">Full name (printed on the letter)</label>
+        <input type="text" id="f-name" name="name" required maxlength="120"
+               value="{{ values.name or '' }}" placeholder="e.g. Priya Sharma">
+        {% if errors.name %}<div class="error">{{ errors.name }}</div>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="f-city">City (printed under your signature)</label>
+        <input type="text" id="f-city" name="city" required maxlength="120"
+               value="{{ values.city or '' }}" placeholder="e.g. Tumakuru, Karnataka">
+        {% if errors.city %}<div class="error">{{ errors.city }}</div>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="f-email">Email (for your proof — never printed)</label>
+        <input type="email" id="f-email" name="email" required maxlength="254"
+               value="{{ values.email or '' }}" placeholder="you@example.com">
+        {% if errors.email %}<div class="error">{{ errors.email }}</div>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="f-phone">Phone (optional)</label>
+        <input type="tel" id="f-phone" name="phone" maxlength="20"
+               value="{{ values.phone or '' }}" placeholder="Optional">
+      </div>
+
+      <div class="field">
+        <label for="f-para">Your own paragraph (optional, max {{ para_max }} characters)</label>
+        <textarea id="f-para" name="personal_para" maxlength="{{ para_max }}"
+                  placeholder="2–3 lines in your own words. It goes into the letter before the closing. Formal tone — no threats, no abuse; see the content policy.">{{ values.personal_para or '' }}</textarea>
+        <div class="hint">Screened per our <a href="{{ url_for('public.content_policy') }}">content policy</a>.
+          Paragraphs that break it are dropped or refunded.</div>
+        {% if errors.personal_para %}<div class="error">{{ errors.personal_para }}</div>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="f-reply">Your postal address (optional — only if you want a ministry reply)</label>
+        <textarea id="f-reply" name="reply_address" maxlength="300" style="min-height:64px"
+                  placeholder="Printed inside the letter as the reply address. Purged 30 days after delivery.">{{ values.reply_address or '' }}</textarea>
+      </div>
+
+      <div class="field">
+        <label>STEP / 02 — Pay the stamp</label>
+        <div class="tier-radios">
+          <label class="tier-radio {% if (values.tier or 'speedpost') == 'speedpost' %}checked{% endif %}">
+            <input type="radio" name="tier" value="speedpost"
+                   {% if (values.tier or 'speedpost') == 'speedpost' %}checked{% endif %}>
+            <b>₹59 Speed Post</b>
+            <small>Envelope photo + India Post tracking. The full proof loop.</small>
+          </label>
+          <label class="tier-radio {% if values.tier == 'epost' %}checked{% endif %}">
+            <input type="radio" name="tier" value="epost"
+                   {% if values.tier == 'epost' %}checked{% endif %}>
+            <b>₹19 ePost</b>
+            <small>India Post prints &amp; delivers. Receipt screenshot as proof.</small>
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="f-tip">Add a chai for the volunteer (optional)</label>
+        <div class="tip-row">
+          <input type="range" id="f-tip" name="tip" min="0" max="500" step="10"
+                 value="{{ values.tip or 0 }}">
+          <span class="tip-value mono" id="tip-value">₹{{ values.tip or 0 }}</span>
+        </div>
+        <div class="hint">Tips land in the public Letters Fund — they sponsor
+          letters for people who can't pay.</div>
+      </div>
+
+      {% if cfg.TURNSTILE_SITE_KEY %}
+      <div class="field">
+        <div class="cf-turnstile" data-sitekey="{{ cfg.TURNSTILE_SITE_KEY }}"></div>
+      </div>
+      {% endif %}
+
+      <div class="hero-ctas">
+        <button class="btn" type="submit">Post my letter →</button>
+        <button class="btn btn-secondary btn-small" type="submit"
+                formaction="{{ url_for('public.preview_pdf') }}" formtarget="_blank">
+          Preview exact PDF
+        </button>
+      </div>
+      <p class="small mono">Today's slots: {{ slots_left() }} left · Posted
+        within 2 working days of payment confirmation, or full refund.</p>
+    </form>
+
+    <div>
+      <div class="preview-label">Live preview — what lands in Shastri Bhawan</div>
+      <div class="letter-preview" id="letter-preview">
+        <p class="lp-right"><span data-lp="name">Your Name</span><br>
+           <span data-lp="city">Your City</span><br>{{ today_str }}</p>
+        <p>To,<br>{{ cfg.MINISTRY_ADDRESS | replace('\n', '<br>') | safe }}</p>
+        <p class="lp-subject">Subject: <span data-lp="subject"></span></p>
+        <p>Respected Sir/Madam,</p>
+        <div data-lp="body"></div>
+        <div data-lp="para"></div>
+        <div data-lp="closer"></div>
+        <p>Yours faithfully,<br><br>
+           <strong data-lp="name2">Your Name</strong><br>
+           <span data-lp="city2">Your City</span><br>
+           (signed via janatakibaat.in)</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script type="application/json" id="tpl-data">
+  {{ tpl_json | safe }}
+</script>
+{% endblock %}
+
+{% block scripts %}
+{% if cfg.TURNSTILE_SITE_KEY %}
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+{% endif %}
+{% endblock %}

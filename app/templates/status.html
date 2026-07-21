@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}{% if order.serial_no %}Letter #{{ "{:,}".format(order.serial_no) }}{% else %}Your letter{% endif %} — Janata Ki Baat{% endblock %}
+{% block content %}
+
+<section class="section">
+  <div class="kicker">ON THE RECORD — {{ order.public_code }}</div>
+  {% if order.serial_no %}
+    <h1 style="margin-top:0">Letter #{{ "{:,}".format(order.serial_no) }}</h1>
+  {% else %}
+    <h1 style="margin-top:0">Your letter</h1>
+  {% endif %}
+  <p class="small">{{ order.template.title }} ·
+     {{ TIERS[order.tier].label }} · {{ order.name }}, {{ order.city }}</p>
+
+  {% if order.status == 'expired' %}
+    <div class="full-banner"><h3 style="margin-top:0">This order expired.</h3>
+      <p>Payment wasn't received within 24 hours, so the slot went back in the
+         pot. No money moved. Want in again?
+         <a href="{{ url_for('public.write') }}" style="color:var(--paper)">Start fresh →</a></p></div>
+  {% elif order.status == 'refunded' %}
+    <div class="full-banner"><h3 style="margin-top:0">Refunded in full.</h3>
+      <p>₹{{ order.total }} went back on the same UPI rail it came from.
+         It's on the <a href="{{ url_for('public.ledger') }}" style="color:var(--paper)">ledger</a>.</p></div>
+  {% else %}
+  {% set states = [
+      ('Queued', 'Order received — ' + order.created_at.strftime('%d %b %Y')),
+      ('Payment confirmed', 'Matched by hand against our UPI app'),
+      ('Printed', 'Signed, folded, stuffed, labelled'),
+      ('Posted', 'Photographed at the post office counter'),
+      ('Delivered', 'Signed for at Shastri Bhawan')
+  ] %}
+  {% set reached = {'pending_payment': 1, 'utr_submitted': 1, 'confirmed': 2,
+                    'printed': 3, 'posted': 4, 'delivered': 5}[order.status] %}
+  <ul class="timeline">
+    {% for label, detail in states %}
+    <li class="{% if loop.index <= reached %}done{% endif %}">
+      <span class="dot">{% if loop.index <= reached %}✓{% endif %}</span>
+      <div class="step-name">{{ label }}</div>
+      <div class="step-detail">
+        {% if loop.index == 1 %}{{ detail }}
+        {% elif loop.index == 2 and order.confirmed_at %}{{ order.confirmed_at.strftime('%d %b %Y') }} — {{ detail }}
+        {% elif loop.index == 4 and order.posted_at %}{{ order.posted_at.strftime('%d %b %Y') }} — {{ detail }}
+        {% elif loop.index == 5 and order.delivered_at %}{{ order.delivered_at.strftime('%d %b %Y') }}
+        {% else %}{{ detail }}{% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+
+  {% if order.status in ('pending_payment',) %}
+    <a class="btn" href="{{ url_for('public.pay', code=order.public_code) }}">Finish payment →</a>
+  {% elif order.status == 'utr_submitted' %}
+    <p><strong>UTR received.</strong> We'll match your payment and confirm
+       within a few hours — email lands when it flips.</p>
+  {% endif %}
+
+  {% if order.tracking_no %}
+  <div class="spacer"></div>
+  <p><strong>India Post tracking:</strong>
+     <span class="pay-code">{{ order.tracking_no }}</span> —
+     <a href="https://www.indiapost.gov.in/_layouts/15/DOP.Portal.Tracking/TrackConsignment.aspx"
+        target="_blank" rel="noopener">track it on indiapost.gov.in</a>
+     (paste the number there).</p>
+  {% endif %}
+
+  {% if order.proof_filename %}
+  <div class="spacer"></div>
+  <div class="kicker">THE PROOF</div>
+  <img class="proof-photo" src="{{ url_for('public.proof_photo', code=order.public_code) }}"
+       alt="Envelope photographed at the post office">
+  <p class="small">Only people with this link see the full photo. The public
+     wall shows it with your name masked.</p>
+  {% endif %}
+
+  <div class="spacer"></div>
+  <p><a href="{{ url_for('public.letter_pdf_route', code=order.public_code) }}"
+        target="_blank">Read your letter (PDF) →</a></p>
+
+  {% if order.is_paid %}
+  <hr class="rule" style="margin:34px 0">
+  <div class="kicker">STEP / 04 — SHOW IT OFF</div>
+  <div class="share-cards">
+    <a href="{{ url_for('public.share_card', code=order.public_code) }}" download>
+      <img src="{{ url_for('public.share_card', code=order.public_code) }}" alt="Square share card"></a>
+    <a href="{{ url_for('public.share_card', code=order.public_code, fmt='story') }}" download>
+      <img src="{{ url_for('public.share_card', code=order.public_code, fmt='story') }}" alt="Story share card"></a>
+  </div>
+  <div class="spacer"></div>
+  {% for cap in captions %}
+  <div class="caption-row">
+    <span class="cap">{{ cap }}</span>
+    <button class="btn btn-small btn-secondary copy-btn" data-copy="{{ cap }}">Copy</button>
+  </div>
+  {% endfor %}
+  <button class="btn btn-small" id="share-btn"
+          data-url="{{ cfg.BASE_URL }}{{ url_for('public.status', code=order.public_code) }}"
+          data-text="{{ captions[0] }}">Share →</button>
+  {% endif %}
+  {% endif %}
+</section>
+
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Who we are — Janata Ki Baat{% endblock %}
+{% block content %}
+<section class="section" style="max-width:820px">
+  <div class="kicker">WHO WE ARE — ON THE RECORD, LIKE EVERYTHING ELSE</div>
+  <h1 style="margin-top:0">An independent postal desk for the movement</h1>
+
+  <p>Janata Ki Baat is a citizen-run service that converts distance into
+  paper on a minister's desk. You pick a formal letter, we print it, post it
+  to the Ministry of Education, photograph the envelope at the counter, and
+  hand you the tracking number. That's the whole product.</p>
+
+  <p><strong>We are not the Cockroach Janta Party.</strong> We are not any
+  party. No political organisation gets your money, your data, or editorial
+  control here. We built this because comment sections kept saying "we
+  should all write letters" — and nobody was holding the stamps.</p>
+
+  <h3>The operator</h3>
+  <p>In a landscape of copycat scam sites, anonymity is what scams look
+  like. So, on the record:</p>
+  <ul>
+    <li><strong>Name:</strong> {{ cfg.OPERATOR_NAME or "—" }}</li>
+    <li><strong>Based in:</strong> {{ cfg.OPERATOR_CITY or "—" }}</li>
+    <li><strong>Contact &amp; grievances:</strong> {{ cfg.OPERATOR_CONTACT }}</li>
+  </ul>
+  <p class="small">Grievances are acknowledged within 48 hours. If we ever
+  can't run the service properly, we stop taking orders before we stop
+  posting letters.</p>
+
+  <h3>The money, briefly</h3>
+  <p>Fees are service charges for printing and postage — itemised on the
+  <a href="{{ url_for('public.ledger') }}">public ledger</a> down to the
+  paisa. Fees are <strong>not donations</strong>, and nothing is ever passed
+  to any political party or campaign. Tips go to the Letters Fund, which
+  sponsors postage for people who can't pay.</p>
+
+  <h3>The line we hold</h3>
+  <p>Letters are formal, lawful petitions to a ministry — the oldest civic
+  channel there is. Our <a href="{{ url_for('public.content_policy') }}">content
+  policy</a> keeps them that way: no threats, no abuse, no defamation, no
+  incitement. Satire in the margins. Dead serious in the mail.</p>
+</section>
+{% endblock %}

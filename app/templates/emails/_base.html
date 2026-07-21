@@ -1,0 +1,26 @@
+{% macro email_shell(preheader) %}
+<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#F4EDDE;font-family:Georgia,'Times New Roman',serif;color:#191111;">
+  <div style="display:none;max-height:0;overflow:hidden;">{{ preheader }}</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F4EDDE;padding:24px 0;">
+    <tr><td align="center">
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
+        <tr><td style="background:#3D0808;color:#F4EDDE;text-align:center;padding:22px 20px;">
+          <div style="font-family:Arial Black,Arial,sans-serif;font-size:26px;letter-spacing:1px;">JANATA KI BAAT</div>
+          <div style="font-family:Courier New,monospace;font-size:11px;color:#E9DDC4;letter-spacing:2px;">VOL. 1 — THE PEOPLE'S POST</div>
+        </td></tr>
+        <tr><td style="background:#FFFDF6;border:2px solid #191111;border-top:none;padding:28px 26px;font-size:16px;line-height:1.6;">
+          {{ caller() }}
+        </td></tr>
+        <tr><td style="text-align:center;padding:18px 20px;font-family:Courier New,monospace;font-size:11px;color:#6E1010;line-height:1.6;">
+          An independent citizen initiative. Not affiliated with the Cockroach
+          Janta Party, any political party, or the Government of India.<br>
+          We mail your words; the words are yours.
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>
+{% endmacro %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Refunds &amp; SLA — Janata Ki Baat{% endblock %}
+{% block content %}
+<section class="section" style="max-width:820px">
+  <div class="kicker">REFUNDS &amp; THE SLA — THE PROMISE, IN WRITING</div>
+  <h1 style="margin-top:0">Posted in 2 working days, or your money back</h1>
+
+  <h3>The service promise</h3>
+  <p>Every paid letter is <strong>posted within 2 working days of payment
+  confirmation</strong>. You get an envelope photo and (Speed Post) a
+  tracking number as proof, on your status page and by email.</p>
+
+  <h3>Automatic refund</h3>
+  <p>If your letter has not been posted within <strong>5 days</strong> of
+  payment confirmation, you get a <strong>full refund — automatically</strong>.
+  You don't have to ask. Refunds go back on the same UPI rail the payment
+  came from and appear on the
+  <a href="{{ url_for('public.ledger') }}">public ledger</a>.</p>
+
+  <h3>Other refund cases</h3>
+  <ul>
+    <li><strong>Content policy:</strong> if your personal paragraph breaks
+      the rules and we decide not to post at all, full refund.</li>
+    <li><strong>Our error:</strong> wrong letter, wrong details, lost order —
+      full refund, no argument.</li>
+    <li><strong>Change of mind:</strong> refundable any time before your
+      letter enters a print run. After it's printed and posted, the letter
+      is with India Post — there is no unsending a protest.</li>
+  </ul>
+
+  <h3>Unpaid orders</h3>
+  <p>Orders with no confirmed payment expire after 24 hours. No money moved,
+  nothing owed, the daily slot goes back in the pot.</p>
+
+  <p class="small">Refund trouble? {{ cfg.OPERATOR_CONTACT }} — acknowledged
+  within 48 hours.</p>
+</section>
+{% endblock %}

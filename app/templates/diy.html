@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Free DIY letter kit — Janata Ki Baat{% endblock %}
+{% block content %}
+
+<section class="section">
+  <div class="kicker">THE FREE ONE — ₹0</div>
+  <h1 style="margin-top:0">Do it yourself. We'll hold the door.</h1>
+  <p class="hero-sub" style="max-width:700px">
+    No payment, no sign-up, nothing owed to us. Download the kit, print a
+    letter (or copy it by hand), stick a ₹5 stamp on it, and post it
+    yourself. The mailbag doesn't care who paid — it counts envelopes.
+  </p>
+  <div class="hero-ctas">
+    <a class="btn" href="{{ url_for('public.diy_kit') }}">Download the kit (PDF) →</a>
+    <a class="btn btn-secondary btn-small" href="{{ url_for('public.write') }}">Or let us post it — ₹19/₹59</a>
+  </div>
+
+  <div class="spacer"></div>
+  <div class="steps">
+    <div class="step"><div class="num">STEP / 01</div><h3>Print or copy</h3>
+      <p>All three letters are in the kit with blanks for your name and
+         city. Handwritten counts double in charm.</p></div>
+    <div class="step"><div class="num">STEP / 02</div><h3>Address it</h3>
+      <p>Union Minister of Education, Ministry of Education, Shastri Bhawan,
+         Dr. Rajendra Prasad Road, New Delhi – 110001.</p></div>
+    <div class="step"><div class="num">STEP / 03</div><h3>Post it</h3>
+      <p>₹5 ordinary post, or ~₹41 Speed Post at the counter if you want a
+         tracking number of your own.</p></div>
+    <div class="step"><div class="num">STEP / 04</div><h3>Tag it</h3>
+      <p>Photograph the envelope, post it with #JanataKiBaat. Every visible
+         letter recruits the next one.</p></div>
+  </div>
+</section>
+
+{% endblock %}

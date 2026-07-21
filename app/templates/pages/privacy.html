@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Privacy — Janata Ki Baat{% endblock %}
+{% block content %}
+<section class="section" style="max-width:820px">
+  <div class="kicker">PRIVACY — PLAIN ENGLISH, AS THE LAW INTENDS</div>
+  <h1 style="margin-top:0">We collect the minimum. We keep it briefly.</h1>
+
+  <h3>What we collect, and why</h3>
+  <ul>
+    <li><strong>Name &amp; city</strong> — printed on your letter. That's the
+      point of the service.</li>
+    <li><strong>Email</strong> — to send you payment confirmation and posting
+      proof. Never printed, never shared.</li>
+    <li><strong>Phone (optional)</strong> — only if you give it, only for
+      order trouble.</li>
+    <li><strong>Postal address (optional)</strong> — only if you want the
+      Ministry to be able to reply to you. Printed inside the letter,
+      <strong>purged from our systems 30 days after delivery</strong>.</li>
+    <li><strong>Your personal paragraph</strong> — printed in the letter,
+      screened against the content policy.</li>
+    <li><strong>UTR / payment reference</strong> — to match your UPI payment.</li>
+  </ul>
+
+  <h3>What we never do</h3>
+  <ul>
+    <li>Sell, rent, or share your data with anyone — including any political
+      party or movement.</li>
+    <li>Run advertising or tracking cookies. Analytics, if any, are
+      Cloudflare's cookieless counts.</li>
+    <li>Keep reply addresses beyond 30 days post-delivery.</li>
+  </ul>
+
+  <h3>Proof photos</h3>
+  <p>Envelope photos are visible in full only on your private status link
+  (an unguessable code). Anything shown publicly has the sender line
+  masked.</p>
+
+  <h3>Your rights</h3>
+  <p>Ask us what we hold about you, ask us to correct it, or ask us to
+  delete it (once your letter is posted, the postal record itself is out of
+  our hands — that's rather the product). Write to
+  {{ cfg.OPERATOR_CONTACT }}; we respond within 48 hours.</p>
+
+  <p class="small">This page is our working notice under India's Digital
+  Personal Data Protection Act, 2023. Questions and complaints:
+  {{ cfg.OPERATOR_CONTACT }}.</p>
+</section>
+{% endblock %}

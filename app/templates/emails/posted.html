@@ -1,0 +1,24 @@
+{% from "emails/_base.html" import email_shell %}
+{% call email_shell("Posted. Here's your proof — envelope photo" ~ (" + tracking" if order.tracking_no else "") ~ ".") %}
+  <p>Namaste {{ order.name }},</p>
+  <p><strong>It's in the mail.</strong> Letter
+  #{{ "{:,}".format(order.serial_no) }} was posted to Shastri Bhawan
+  today{% if order.tracking_no %} by Speed Post{% endif %}.</p>
+  {% if order.tracking_no %}
+  <p>India Post consignment number:<br>
+  <span style="font-family:Courier New,monospace;font-size:18px;background:#E9DDC4;
+        padding:4px 10px;border:2px solid #191111;display:inline-block;margin-top:4px;">
+    {{ order.tracking_no }}</span><br>
+  <span style="font-size:13px;">Track it at indiapost.gov.in → Track Consignment.</span></p>
+  {% endif %}
+  <p>Your envelope photo and the full record are on your status page:</p>
+  <p style="text-align:center;margin:26px 0;">
+    <a href="{{ status_url }}" style="background:#C1121F;color:#F4EDDE;text-decoration:none;
+       font-family:Arial Black,Arial,sans-serif;font-size:17px;padding:13px 26px;
+       border:2px solid #191111;display:inline-block;">SEE THE PROOF →</a>
+  </p>
+  <p>A ministry has to receive and log physical correspondence. Yours is now
+  part of a mailbag that can't be scrolled past. Thank you.</p>
+  <p>— Janata Ki Baat<br>
+  <span style="font-size:13px;">On record, not just online.</span></p>
+{% endcall %}

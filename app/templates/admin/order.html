@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}{{ order.public_code }} — ops{% endblock %}
+{% block content %}
+<section class="section" style="max-width:860px">
+  <div class="kicker"><a href="{{ url_for('admin.queue') }}">← QUEUE</a> / {{ order.public_code }}</div>
+  <h1 style="margin-top:0">{{ order.name }}, {{ order.city }}
+    {% if order.serial_no %}<span style="color:var(--stamp-red)">#{{ order.serial_no }}</span>{% endif %}</h1>
+  <p class="small mono">
+    {{ order.status }} · {{ order.tier }} ₹{{ order.amount }} + tip ₹{{ order.tip }}
+    · {{ order.email }}{% if order.phone %} · {{ order.phone }}{% endif %}
+    · created {{ order.created_at.strftime('%d %b %H:%M') }} UTC
+    {% if order.utr %} · UTR <strong>{{ order.utr }}</strong>{% endif %}
+  </p>
+  <p>
+    <a href="{{ url_for('public.letter_pdf_route', code=order.public_code) }}" target="_blank">Letter PDF →</a> ·
+    <a href="{{ url_for('public.status', code=order.public_code) }}" target="_blank">Public status page →</a>
+  </p>
+
+  {% if order.flagged %}
+  <div class="flag"><strong>⚑ Flagged:</strong> {{ order.flag_reason }} —
+    read the paragraph below; drop it or refund per policy.</div>
+  {% endif %}
+  {% if order.personal_para %}
+  <div class="manifesto" style="max-width:none; margin:14px 0">
+    <div class="kicker">PERSONAL PARAGRAPH — HUMAN READ REQUIRED</div>
+    <p>{{ order.personal_para }}</p>
+    <form method="post" action="{{ url_for('admin.drop_para', order_id=order.id) }}">
+      <button class="btn btn-small btn-secondary" type="submit">Drop paragraph, send template only</button>
+    </form>
+  </div>
+  {% endif %}
+  {% if order.reply_address %}
+  <p class="small"><strong>Reply address on letter:</strong> {{ order.reply_address }}</p>
+  {% endif %}
+
+  <div class="admin-actions" style="margin:18px 0">
+    {% if order.status == 'utr_submitted' %}
+    <form method="post" action="{{ url_for('admin.confirm', order_id=order.id) }}">
+      <button class="btn btn-small" type="submit">Confirm payment ✓</button></form>
+    {% endif %}
+    {% if not order.is_paid and order.status not in ('expired', 'refunded') %}
+    <form method="post" action="{{ url_for('admin.expire', order_id=order.id) }}">
+      <button class="btn btn-small btn-secondary" type="submit">Expire ✕</button></form>
+    {% endif %}
+    {% if order.is_paid and order.status != 'refunded' %}
+    <form method="post" action="{{ url_for('admin.refund', order_id=order.id) }}"
+          onsubmit="return confirm('Mark refunded? You must also send ₹{{ order.total }} back on UPI.')">
+      <button class="btn btn-small btn-secondary" type="submit">Refund ↩</button></form>
+    {% endif %}
+    {% if order.status == 'posted' %}
+    <form method="post" action="{{ url_for('admin.mark_delivered', order_id=order.id) }}">
+      <button class="btn btn-small" type="submit">Mark delivered ✓</button></form>
+    {% endif %}
+  </div>
+
+  {% if order.status in ('printed', 'confirmed') %}
+  <hr class="rule" style="margin:26px 0">
+  <div class="kicker">POST + PROOF (runbook steps 2–4)</div>
+  <form method="post" enctype="multipart/form-data" class="form-grid"
+        action="{{ url_for('admin.mark_posted', order_id=order.id) }}">
+    <div class="field">
+      <label>Envelope / receipt photo (jpg, png, webp)</label>
+      <input type="file" name="proof" accept=".jpg,.jpeg,.png,.webp">
+    </div>
+    <div class="field">
+      <label>Tracking / consignment no. {% if order.tier == 'speedpost' %}(required){% else %}(ePost: leave blank){% endif %}</label>
+      <input type="text" name="tracking_no" maxlength="40"
+             value="{{ order.tracking_no or '' }}" placeholder="EK123456789IN">
+    </div>
+    <button class="btn" type="submit">Mark posted — fires proof email →</button>
+  </form>
+  {% endif %}
+
+  {% if order.proof_filename %}
+  <div class="spacer"></div>
+  <img class="proof-photo" style="max-width:420px"
+       src="{{ url_for('public.proof_photo', code=order.public_code) }}" alt="proof">
+  {% endif %}
+</section>
+{% endblock %}

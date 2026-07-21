@@ -1,0 +1,188 @@
+"""End-to-end smoke test of the full loop against a throwaway SQLite DB.
+
+  ./.venv/Scripts/python scripts/smoke_test.py
+
+Drives: landing -> write -> pay -> UTR -> admin confirm -> print run ->
+proof upload -> status/share/PDF -> ledger -> policies -> moderation flag ->
+cap-full waitlist redirect. Exits non-zero on first failure.
+"""
+import io
+import os
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+TEST_DB = ROOT / "instance" / "smoke_test.db"
+TEST_DB.parent.mkdir(exist_ok=True)
+if TEST_DB.exists():
+    TEST_DB.unlink()
+os.environ["DATABASE_URL"] = f"sqlite:///{TEST_DB.as_posix()}"
+
+from app import create_app  # noqa: E402
+from app.extensions import db  # noqa: E402
+from app.models import DailyCap, LedgerEntry, Order  # noqa: E402
+from app.services.util import ist_today  # noqa: E402
+
+PASS = 0
+
+
+def check(label, cond, detail=""):
+    global PASS
+    if not cond:
+        print(f"FAIL: {label} {detail}")
+        sys.exit(1)
+    PASS += 1
+    print(f"  ok: {label}")
+
+
+def main():
+    app = create_app()
+    app.config["TESTING"] = True
+    client = app.test_client()
+
+    # --- public pages render ---
+    for path in ["/", "/write", "/ledger", "/diy", "/about", "/privacy",
+                 "/content-policy", "/refunds"]:
+        r = client.get(path)
+        check(f"GET {path}", r.status_code == 200, f"-> {r.status_code}")
+    r = client.get("/nonexistent")
+    check("404 page", r.status_code == 404 and b"Accountability" in r.data)
+    r = client.get("/diy/kit.pdf")
+    check("DIY kit PDF", r.status_code == 200 and r.data[:4] == b"%PDF")
+
+    # --- write flow ---
+    form = {
+        "template": "neet-accountability",
+        "name": "Asha Test",
+        "city": "Tumakuru, Karnataka",
+        "email": "asha@example.com",
+        "phone": "",
+        "personal_para": "I appeared for NEET-UG 2026 and lost a year to "
+                         "this leak. Please act.",
+        "reply_address": "12 MG Road, Tumakuru 572101",
+        "tier": "speedpost",
+        "tip": "20",
+    }
+    r = client.post("/preview", data=form)
+    check("live PDF preview", r.status_code == 200 and r.data[:4] == b"%PDF")
+
+    r = client.post("/write", data=form)
+    check("order created", r.status_code == 302 and "/pay/JKB-" in r.headers["Location"])
+    code = r.headers["Location"].rstrip("/").split("/")[-1]
+
+    with app.app_context():
+        order = Order.query.filter_by(public_code=code).first()
+        check("order in DB", order is not None and order.total == 79)
+        check("slot consumed",
+              db.session.get(DailyCap, ist_today()).used == 1)
+        order_id = order.id
+
+    r = client.get(f"/pay/{code}")
+    check("pay page", r.status_code == 200 and b"UPI" in r.data
+          and code.encode() in r.data)
+    r = client.get(f"/pay/{code}/qr.png")
+    check("UPI QR", r.status_code == 200 and r.data[:8] == b"\x89PNG\r\n\x1a\n")
+
+    r = client.post(f"/pay/{code}/utr", data={"utr": "415023998877"})
+    check("UTR submit", r.status_code == 302)
+    r = client.get(f"/letter/{code}")
+    check("status page (utr_submitted)", r.status_code == 200
+          and b"UTR received" in r.data)
+
+    # --- admin loop ---
+    r = client.post("/admin/login", data={"password": "wrong"})
+    check("admin rejects wrong password", b"Wrong password" in r.data)
+    r = client.post("/admin/login",
+                    data={"password": os.environ.get("ADMIN_PASSWORD",
+                                                     "dev-admin-123")})
+    check("admin login", r.status_code == 302)
+    r = client.get("/admin/")
+    check("admin queue", r.status_code == 200 and code.encode() in r.data)
+
+    r = client.post(f"/admin/order/{order_id}/confirm")
+    check("confirm payment", r.status_code == 302)
+    with app.app_context():
+        order = db.session.get(Order, order_id)
+        check("serial assigned", order.serial_no == 1)
+        check("fee+tip on ledger",
+              LedgerEntry.query.filter_by(order_ref=code).count() == 2)
+
+    r = client.post("/admin/print-run")
+    check("print run PDF", r.status_code == 200 and r.data[:4] == b"%PDF")
+    with app.app_context():
+        check("flipped to printed",
+              db.session.get(Order, order_id).status == "printed")
+
+    # proof upload (tiny generated PNG)
+    from PIL import Image
+    img = io.BytesIO()
+    Image.new("RGB", (60, 40), "#C1121F").save(img, "PNG")
+    img.seek(0)
+    r = client.post(f"/admin/order/{order_id}/posted", data={
+        "tracking_no": "EK123456789IN",
+        "proof": (img, "envelope.png"),
+    }, content_type="multipart/form-data")
+    check("mark posted", r.status_code == 302)
+    with app.app_context():
+        order = db.session.get(Order, order_id)
+        check("posted with proof", order.status == "posted"
+              and order.proof_filename)
+        check("postage on ledger", LedgerEntry.query.filter_by(
+            order_ref=code, type="postage").count() == 1)
+
+    # --- proof, PDF, cards on public status ---
+    r = client.get(f"/letter/{code}")
+    check("status shows proof + tracking", b"EK123456789IN" in r.data
+          and b"THE PROOF" in r.data)
+    r = client.get(f"/letter/{code}/proof")
+    check("proof photo served", r.status_code == 200)
+    r = client.get(f"/letter/{code}/letter.pdf")
+    check("letter PDF", r.status_code == 200 and r.data[:4] == b"%PDF")
+    for fmt in ["square", "story"]:
+        r = client.get(f"/letter/{code}/card.png?fmt={fmt}")
+        check(f"share card {fmt}", r.status_code == 200
+              and r.data[:8] == b"\x89PNG\r\n\x1a\n")
+
+    r = client.post(f"/admin/order/{order_id}/delivered")
+    with app.app_context():
+        check("delivered", db.session.get(Order, order_id).status == "delivered")
+
+    # --- ledger totals ---
+    r = client.get("/ledger")
+    check("ledger shows entries", r.status_code == 200 and code.encode() in r.data)
+
+    # --- moderation flag ---
+    form2 = dict(form, email="second@example.com",
+                 personal_para="I will burn down the ministry.")
+    r = client.post("/write", data=form2)
+    check("flagged order accepted", r.status_code == 302)
+    code2 = r.headers["Location"].rstrip("/").split("/")[-1]
+    with app.app_context():
+        o2 = Order.query.filter_by(public_code=code2).first()
+        check("moderation flag set", o2.flagged and "burn down" in o2.flag_reason)
+
+    # --- emails landed in dev outbox ---
+    outbox = Path(app.instance_path) / "outbox"
+    mails = list(outbox.glob("*.html")) if outbox.exists() else []
+    check("emails in dev outbox (2 received + 1 confirmed + 1 posted)",
+          len(mails) >= 4, f"found {len(mails)}")
+
+    # --- cap full -> waitlist ---
+    with app.app_context():
+        row = db.session.get(DailyCap, ist_today())
+        row.used = row.cap_limit
+        db.session.commit()
+    form3 = dict(form, email="third@example.com", personal_para="")
+    r = client.post("/write", data=form3)
+    check("cap full redirects to waitlist", r.status_code == 302
+          and "waitlist" in r.headers["Location"])
+    r = client.post("/waitlist", data={"email": "third@example.com"})
+    check("waitlist capture", r.status_code == 302)
+
+    print(f"\nALL {PASS} CHECKS PASSED")
+
+
+if __name__ == "__main__":
+    main()

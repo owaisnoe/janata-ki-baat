@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}The public ledger — Janata Ki Baat{% endblock %}
+{% block content %}
+
+<section class="section">
+  <div class="kicker">THE LEDGER — DOWN TO THE PAISA</div>
+  <h1 style="margin-top:0">Where the money goes</h1>
+  <p class="small" style="max-width:700px">
+    Every rupee in, every rupee out, in public. Fees and tips come in;
+    postage, paper and infrastructure go out. Whatever's left is the
+    <strong>Letters Fund</strong> — it sponsors letters for people who can't
+    pay. Nothing here is a donation and none of it touches any party.
+  </p>
+
+  <div class="ledger-totals" style="margin-top:26px">
+    <div class="ledger-card">
+      <div class="amt amt-in">₹{{ "%.2f" | format(totals.get('fee', 0) + totals.get('tip', 0)) }}</div>
+      <div class="lbl">In — fees + tips</div>
+    </div>
+    <div class="ledger-card">
+      <div class="amt amt-out">₹{{ "%.2f" | format((totals.get('postage', 0) + totals.get('print', 0) + totals.get('infra', 0) + totals.get('refund', 0)) | abs) }}</div>
+      <div class="lbl">Out — postage, print, infra, refunds</div>
+    </div>
+    <div class="ledger-card">
+      <div class="amt">₹{{ "%.2f" | format(balance) }}</div>
+      <div class="lbl">Letters Fund balance</div>
+    </div>
+    <div class="ledger-card">
+      <div class="amt">{{ "{:,}".format(letters_count()) }}</div>
+      <div class="lbl">Letters confirmed</div>
+    </div>
+  </div>
+
+  {% if entries %}
+  <table class="ledger-table">
+    <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Note</th><th>Order</th><th>Receipt</th></tr></thead>
+    <tbody>
+      {% for e in entries %}
+      <tr>
+        <td class="mono">{{ e.created_at.strftime('%d %b %Y') }}</td>
+        <td class="mono">{{ e.type }}</td>
+        <td class="{% if e.amount >= 0 %}amt-in{% else %}amt-out{% endif %}">
+          {{ '+' if e.amount >= 0 }}₹{{ "%.2f" | format(e.amount) }}</td>
+        <td>{{ e.note or '—' }}</td>
+        <td class="mono">{{ e.order_ref or '—' }}</td>
+        <td>{% if e.receipt_url %}<a href="{{ e.receipt_url }}" target="_blank" rel="noopener">view</a>{% else %}—{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="mono">No entries yet. The first confirmed letter starts the books.</p>
+  {% endif %}
+</section>
+
+{% endblock %}

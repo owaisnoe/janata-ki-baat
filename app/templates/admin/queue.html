@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Ops queue — Janata Ki Baat{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="kicker">THE BACK ROOM — DAILY RUNBOOK ORDER: CONFIRM → PRINT → POST</div>
+  <h1 style="margin-top:0">Ops queue</h1>
+  <p class="small mono">
+    {{ "{:,}".format(letters_count()) }} letters confirmed ·
+    slots left today: {{ slots_left() }} ·
+    waitlist: {{ waitlist_count }}
+    {% if flagged_count %} · <span style="color:var(--stamp-red-dark)">⚑ {{ flagged_count }} flagged for review</span>{% endif %}
+    · <a href="{{ url_for('admin.export_csv') }}">export CSV</a>
+    · <a href="{{ url_for('admin.logout') }}">logout</a>
+  </p>
+
+  <div class="admin-tabs">
+    {% for name, label in [('confirm', 'Confirm UTR'), ('print', 'To print'),
+                           ('post', 'To post'), ('posted', 'Posted'),
+                           ('pending', 'Awaiting payment'), ('done', 'Closed')] %}
+    <a href="{{ url_for('admin.queue', tab=name) }}"
+       class="{% if tab == name %}active{% endif %}">{{ label }}
+       <span class="badge">{{ counts[name] }}</span></a>
+    {% endfor %}
+  </div>
+
+  {% if tab == 'print' and orders %}
+  <form method="post" action="{{ url_for('admin.print_run') }}" style="margin-bottom:18px">
+    <button class="btn btn-small" type="submit">
+      Print run — {{ orders | length }} letters + labels (PDF) →</button>
+    <span class="small"> Generating the PDF flips these to "printed".</span>
+  </form>
+  {% endif %}
+
+  {% if orders %}
+  <table class="admin-table">
+    <thead><tr>
+      <th>Code</th><th>#</th><th>Name / city</th><th>Tier</th><th>₹</th>
+      <th>UTR</th><th>Status</th><th>Flags</th><th></th>
+    </tr></thead>
+    <tbody>
+      {% for o in orders %}
+      <tr>
+        <td class="mono"><a href="{{ url_for('admin.order_detail', order_id=o.id) }}">{{ o.public_code }}</a></td>
+        <td class="mono">{{ o.serial_no or '—' }}</td>
+        <td>{{ o.name }}<br><span class="small">{{ o.city }}</span></td>
+        <td class="mono">{{ o.tier }}</td>
+        <td class="mono">{{ o.total }}</td>
+        <td class="mono">{{ o.utr or '—' }}</td>
+        <td class="mono">{{ o.status }}</td>
+        <td>{% if o.flagged %}<span style="color:var(--stamp-red-dark)">⚑</span>{% endif %}
+            {% if o.personal_para %}¶{% endif %}</td>
+        <td class="admin-actions">
+          {% if o.status == 'utr_submitted' %}
+          <form method="post" action="{{ url_for('admin.confirm', order_id=o.id) }}">
+            <button class="btn btn-small" type="submit">Confirm ✓</button>
+          </form>
+          {% elif o.status == 'printed' %}
+          <a class="btn btn-small btn-secondary" href="{{ url_for('admin.order_detail', order_id=o.id) }}">Post + proof →</a>
+          {% elif o.status == 'posted' %}
+          <form method="post" action="{{ url_for('admin.mark_delivered', order_id=o.id) }}">
+            <button class="btn btn-small btn-secondary" type="submit">Delivered ✓</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="mono">Nothing in this queue. Good.</p>
+  {% endif %}
+
+  <hr class="rule" style="margin:36px 0">
+  <div class="kicker">QUICK LEDGER ENTRY</div>
+  <form method="post" action="{{ url_for('admin.add_ledger') }}" class="form-grid" style="max-width:520px">
+    <div class="field"><label>Type</label>
+      <select name="type">
+        {% for t in ['postage', 'print', 'infra', 'fee', 'tip', 'refund', 'fund'] %}
+        <option value="{{ t }}">{{ t }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field"><label>Amount (₹; negative = money out)</label>
+      <input type="text" name="amount" required placeholder="-413.00"></div>
+    <div class="field"><label>Note</label>
+      <input type="text" name="note" placeholder="Batch #3 Speed Post, 10 letters"></div>
+    <div class="field"><label>Receipt URL (optional)</label>
+      <input type="text" name="receipt_url" placeholder="https://…"></div>
+    <button class="btn btn-small" type="submit">Add entry →</button>
+  </form>
+</section>
+{% endblock %}

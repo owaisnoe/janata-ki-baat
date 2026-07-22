@@ -20,7 +20,7 @@ from flask import (
 from ..extensions import db, limiter
 from ..models import LedgerEntry, Order, Sponsorship, WaitlistEntry, utcnow
 from ..services import mailer, pdf
-from ..services.util import next_serial, release_slot
+from ..services.util import fund_balance, next_serial, release_slot
 
 bp = Blueprint("admin", __name__)
 
@@ -94,7 +94,7 @@ def queue():
     return render_template(
         "admin/queue.html", orders=orders, tab=tab, counts=counts,
         flagged_count=flagged_count, waitlist_count=waitlist_count,
-        sponsorships=sponsorships,
+        sponsorships=sponsorships, fund=fund_balance(),
     )
 
 
@@ -123,13 +123,19 @@ def confirm(order_id):
     order.serial_no = next_serial()
     from ..services.util import promised_post_date
     order.promised_date = promised_post_date()
-    db.session.add(LedgerEntry(type="fee", amount=order.amount,
-                               order_ref=order.public_code,
-                               note=f"{order.tier} fee"))
-    if order.tip:
-        db.session.add(LedgerEntry(type="tip", amount=order.tip,
+    if order.sponsored_request:
+        tier_price = current_app.config["TIERS"][order.tier]["price"]
+        db.session.add(LedgerEntry(type="fund", amount=-tier_price,
                                    order_ref=order.public_code,
-                                   note="chai for the volunteer"))
+                                   note="sponsored letter (fund draw)"))
+    else:
+        db.session.add(LedgerEntry(type="fee", amount=order.amount,
+                                   order_ref=order.public_code,
+                                   note=f"{order.tier} fee"))
+        if order.tip:
+            db.session.add(LedgerEntry(type="tip", amount=order.tip,
+                                       order_ref=order.public_code,
+                                       note="chai for the volunteer"))
     db.session.commit()
 
     status_url = current_app.config["BASE_URL"] + url_for(

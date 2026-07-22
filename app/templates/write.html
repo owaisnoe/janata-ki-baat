@@ -97,6 +97,16 @@
       </div>
 
       <div class="field">
+        <label class="chip" style="display:inline-flex;gap:8px;align-items:center;">
+          <input type="checkbox" name="cant_pay" value="on"
+                 {% if values.cant_pay %}checked{% endif %}>
+          I can't pay — post mine from the Letters Fund
+        </label>
+        <div class="hint">Sponsored letters go out when the fund covers them —
+          first asked, first posted. No questions, no means test.</div>
+      </div>
+
+      <div class="field">
         <label>Add a chai for the volunteer (optional)</label>
         <div class="chips" id="tip-chips">
           {% for amt, lbl in [(0, "no chai"), (10, "cutting chai"), (20, "chai + Parle-G"), (50, "full tiffin")] %}

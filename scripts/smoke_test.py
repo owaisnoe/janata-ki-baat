@@ -253,6 +253,26 @@ def main():
         check("fund entry on ledger", LedgerEntry.query.filter_by(
             type="fund", order_ref=scode).count() == 1)
 
+    # --- can't-pay sponsored request ---
+    form_sp = dict(form, email="hostel@example.com", personal_para="",
+                   cant_pay="on")
+    r = client.post("/write", data=form_sp)
+    check("sponsored request accepted", r.status_code == 302
+          and "/letter/JKB-" in r.headers["Location"])
+    code_sp = r.headers["Location"].rstrip("/").split("/")[-1]
+    with app.app_context():
+        osp = Order.query.filter_by(public_code=code_sp).first()
+        check("sponsored request flags", osp.sponsored_request
+              and osp.amount == 0 and osp.status == "utr_submitted")
+        osp_id = osp.id
+    r = client.get("/admin/?tab=confirm")
+    check("FUND tag + fund balance in queue", b"FUND" in r.data
+          and b"fund \xe2\x82\xb9" in r.data)
+    r = client.post(f"/admin/order/{osp_id}/confirm")
+    with app.app_context():
+        check("fund debited for sponsored letter", LedgerEntry.query.filter_by(
+            type="fund", order_ref=code_sp).filter(LedgerEntry.amount < 0).count() == 1)
+
     print(f"\nALL {PASS} CHECKS PASSED")
 
 

@@ -53,6 +53,9 @@ class Order(db.Model):
     flagged = db.Column(db.Boolean, nullable=False, default=False)
     flag_reason = db.Column(db.String(200), nullable=True)
 
+    # "I can't pay" letters: ₹0 order posted when the Letters Fund covers it.
+    sponsored_request = db.Column(db.Boolean, nullable=False, default=False)
+
     # Honest posts-by date, computed from queue depth at admin confirm time.
     promised_date = db.Column(db.Date, nullable=True)
 

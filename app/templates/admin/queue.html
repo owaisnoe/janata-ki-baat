@@ -7,7 +7,8 @@
   <p class="small mono">
     {{ "{:,}".format(letters_count()) }} letters confirmed ·
     slots left today: {{ slots_left() }} ·
-    waitlist: {{ waitlist_count }}
+    waitlist: {{ waitlist_count }} ·
+    fund ₹{{ "%.2f"|format(fund) }}
     {% if flagged_count %} · <span style="color:var(--stamp-red-dark)">⚑ {{ flagged_count }} flagged for review</span>{% endif %}
     · <a href="{{ url_for('admin.export_csv') }}">export CSV</a>
     · <a href="{{ url_for('admin.logout') }}">logout</a>
@@ -75,7 +76,8 @@
         <td class="mono">{{ o.utr or '—' }}</td>
         <td class="mono">{{ o.status }}</td>
         <td>{% if o.flagged %}<span style="color:var(--stamp-red-dark)">⚑</span>{% endif %}
-            {% if o.personal_para %}¶{% endif %}</td>
+            {% if o.personal_para %}¶{% endif %}
+            {% if o.sponsored_request %}<span class="mono" style="color:var(--stamp-red-dark)">FUND</span>{% endif %}</td>
         <td class="admin-actions">
           {% if o.status == 'utr_submitted' %}
           <form method="post" action="{{ url_for('admin.confirm', order_id=o.id) }}">

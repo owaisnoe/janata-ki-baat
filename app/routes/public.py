@@ -109,6 +109,7 @@ def _validate_write_form(form):
         "reply_address": (form.get("reply_address") or "").strip()[:300],
         "tier": (form.get("tier") or "speedpost").strip(),
         "tip": form.get("tip", "0"),
+        "cant_pay": form.get("cant_pay") == "on",
     }
     errors = {}
     if len(values["name"]) < 2:
@@ -167,8 +168,26 @@ def write_submit():
         flagged=flagged,
         flag_reason=flag_reason,
     )
+    if values["cant_pay"]:
+        order.amount = 0
+        order.tip = 0
+        order.sponsored_request = True
+        order.status = "utr_submitted"
     db.session.add(order)
     db.session.commit()
+
+    if order.sponsored_request:
+        status_url = current_app.config["BASE_URL"] + url_for(
+            "public.status", code=order.public_code)
+        mailer.send_email(
+            order.email,
+            f"Your letter is queued — {order.public_code}",
+            render_template("emails/order_received.html", order=order,
+                            pay_url=status_url),
+        )
+        flash("You're in the queue — your letter posts as soon as the "
+              "Letters Fund covers it. Watch this page.", "success")
+        return redirect(url_for("public.status", code=order.public_code))
 
     pay_url = current_app.config["BASE_URL"] + url_for("public.pay", code=order.public_code)
     mailer.send_email(

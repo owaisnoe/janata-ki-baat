@@ -199,7 +199,6 @@ def main():
           len(mails) >= 4, f"found {len(mails)}")
     latest = max(mails, key=lambda p: p.stat().st_mtime).read_text(encoding="utf-8")
     check("emails restyled (no maroon)", "3D0808" not in latest and "C1121F" not in latest)
-    check("sponsor receipt sent", any("receipt" in m.name for m in mails))
 
     # --- uncapped default + promised date ---
     with app.app_context():
@@ -255,6 +254,9 @@ def main():
     with app.app_context():
         check("fund entry on ledger", LedgerEntry.query.filter_by(
             type="fund", order_ref=scode).count() == 1)
+
+    mails = list(outbox.glob("*.html")) if outbox.exists() else []
+    check("sponsor receipt sent", any("receipt" in m.name for m in mails))
 
     # --- can't-pay sponsored request ---
     form_sp = dict(form, email="hostel@example.com", personal_para="",

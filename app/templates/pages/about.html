@@ -5,7 +5,7 @@
   <div class="kicker">WHO WE ARE — ON THE RECORD, LIKE EVERYTHING ELSE</div>
   <h1 style="margin-top:0">An independent postal desk for the movement</h1>
 
-  <p>Janata Ki Baat is a citizen-run service that converts distance into
+  <p>Janata Ki Baat is a student-run service that converts distance into
   paper on a minister's desk. You pick a formal letter, we print it, post it
   to the Ministry of Education, photograph the envelope at the counter, and
   hand you the tracking number. That's the whole product.</p>
@@ -15,12 +15,15 @@
   control here. We built this because comment sections kept saying "we
   should all write letters" — and nobody was holding the stamps.</p>
 
-  <h3>The operator</h3>
-  <p>In a landscape of copycat scam sites, anonymity is what scams look
-  like. So, on the record:</p>
+  <h3>Who runs it</h3>
+  <p>Janata Ki Baat is run <strong>by students, for students</strong> — a
+  small volunteer desk, not a company and not a party. In a landscape of
+  copycat scam sites, we know trust has to be earned in public, so we earn
+  it with receipts rather than credentials: every rupee sits on the
+  <a href="{{ url_for('public.ledger') }}">public ledger</a>, every envelope
+  is photographed at the post-office counter, and a real person answers this
+  address:</p>
   <ul>
-    <li><strong>Name:</strong> {{ cfg.OPERATOR_NAME or "—" }}</li>
-    <li><strong>Based in:</strong> {{ cfg.OPERATOR_CITY or "—" }}</li>
     <li><strong>Contact &amp; grievances:</strong> {{ cfg.OPERATOR_CONTACT }}</li>
   </ul>
   <p class="small">Grievances are acknowledged within 48 hours. If we ever

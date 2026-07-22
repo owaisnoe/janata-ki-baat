@@ -1,12 +1,14 @@
 {% from "emails/_base.html" import email_shell %}
-{% call email_shell("Receipt — you sponsored " ~ s.bundle_qty ~ " letter(s) via the Letters Fund.") %}
-  <p>Thank you for sponsoring {{ s.bundle_qty }} letter{{ 's' if s.bundle_qty != 1 else '' }}.</p>
-  <p>Your payment of <strong style="color:#C1121F;">₹{{ s.amount }}</strong>
-  has been confirmed and added to the public Letters Fund under
-  <strong>{{ s.public_code }}</strong>.</p>
-  <p>Every rupee sits in the fund until someone who can't pay claims a free
-  letter — then it covers their stamp, exactly like a paid letter. The full
-  fund balance is visible on the <a href="https://janatakibaat.in/ledger">public ledger</a>.</p>
+{% call email_shell("Receipt — your sponsorship is in the Letters Fund.") %}
+  <p>Namaste,</p>
+  <p><strong>₹{{ s.amount }} received.</strong> You just sponsored
+  {{ s.bundle_qty }} letter{{ 's' if s.bundle_qty > 1 }} to the Education
+  Ministry for someone who couldn't spare the stamp.</p>
+  <p>Your money sits in the public Letters Fund and leaves it only as
+  postage — every paisa visible on the ledger under
+  <span style="font-family:Courier New,monospace;">{{ s.public_code }}</span>.</p>
+  <p>When a sponsored letter posts, it counts on the public counter like
+  any other. Distance is not silence — and now, neither is a tight month.</p>
   <p>— Janata Ki Baat<br>
-  <span style="font-size:13px;">Distance is not silence.</span></p>
+  <span style="font-size:13px;">From the students, for the students.</span></p>
 {% endcall %}

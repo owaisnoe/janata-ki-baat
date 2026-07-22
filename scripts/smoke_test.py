@@ -197,6 +197,9 @@ def main():
     mails = list(outbox.glob("*.html")) if outbox.exists() else []
     check("emails in dev outbox (2 received + 1 confirmed + 1 posted)",
           len(mails) >= 4, f"found {len(mails)}")
+    latest = max(mails, key=lambda p: p.stat().st_mtime).read_text(encoding="utf-8")
+    check("emails restyled (no maroon)", "3D0808" not in latest and "C1121F" not in latest)
+    check("sponsor receipt sent", any("receipt" in m.name for m in mails))
 
     # --- uncapped default + promised date ---
     with app.app_context():

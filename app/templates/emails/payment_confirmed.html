@@ -2,7 +2,7 @@
 {% call email_shell("Payment confirmed — you are Letter #" ~ order.serial_no ~ ".") %}
   <p>Namaste {{ order.name }},</p>
   <p>Payment confirmed. You are officially
-  <strong style="color:#C1121F;">Letter #{{ "{:,}".format(order.serial_no) }}</strong>
+  <strong style="color:#B93511;">Letter #{{ "{:,}".format(order.serial_no) }}</strong>
   to the Education Ministry.</p>
   <p>What happens next: your letter goes into the next print run, gets
   signed-folded-stuffed, and is <strong>posted within 2 working days</strong>.
@@ -10,9 +10,9 @@
   Post tracking number{% endif %} right here. If we blow the 5-day deadline,
   you're refunded in full, automatically.</p>
   <p style="text-align:center;margin:26px 0;">
-    <a href="{{ status_url }}" style="background:#C1121F;color:#F4EDDE;text-decoration:none;
-       font-family:Arial Black,Arial,sans-serif;font-size:17px;padding:13px 26px;
-       border:2px solid #191111;display:inline-block;">TRACK MY LETTER →</a>
+    <a href="{{ status_url }}" style="background:#B93511;color:#F7F3EC;text-decoration:none;
+       font-family:Georgia,'Times New Roman',serif;font-size:17px;padding:13px 26px;
+       border:1px solid #171512;display:inline-block;">TRACK MY LETTER →</a>
   </p>
   <p>Feeling loud? Your share card is on that page too — every visible
   letter recruits the next one.</p>

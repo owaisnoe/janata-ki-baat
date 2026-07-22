@@ -209,6 +209,12 @@ def main():
     r = client.get("/write")
     check("write shows posts-by date", b"posts by" in r.data.lower())
 
+    # --- Task 5: write page seals, tip chips, ink signature, city postmark ---
+    r = client.get("/write")
+    check("tip chips", b"cutting chai" in r.data and b"full tiffin" in r.data)
+    check("ink signature slot", b'data-lp="sig"' in r.data)
+    check("city postmark slot", b"city-postmark" in r.data)
+
     # --- capped mode still works as the emergency brake ---
     app.config["DAILY_CAP"] = 1
     with app.app_context():

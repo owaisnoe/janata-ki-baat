@@ -32,6 +32,8 @@
       q('[data-lp="name2"]').textContent = name;
       q('[data-lp="city"]').textContent = city;
       q('[data-lp="city2"]').textContent = city;
+      var sig = q('[data-lp="sig"]');
+      if (sig) sig.textContent = name === "Your Name" ? "" : name;
       if (!tpl) return;
       q('[data-lp="subject"]').textContent = tpl.subject;
       var paras = tpl.paras.slice();
@@ -56,9 +58,35 @@
       });
     });
     render();
+
+    /* city postmark inks in as you type */
+    var pm = document.getElementById("city-postmark");
+    if (pm && cityInput) {
+      cityInput.addEventListener("input", function () {
+        var c = cityInput.value.trim();
+        pm.classList.toggle("inked", c.length > 1);
+        var t = pm.querySelector("svg text");
+        if (t) t.textContent = (c || "YOUR CITY").toUpperCase().slice(0, 12);
+      });
+    }
+    /* tip chips */
+    var chipBox = document.getElementById("tip-chips");
+    if (chipBox) {
+      var hidden = document.getElementById("f-tip");
+      var custom = document.getElementById("tip-custom");
+      chipBox.querySelectorAll(".chip").forEach(function (ch) {
+        ch.addEventListener("click", function () {
+          chipBox.querySelectorAll(".chip").forEach(function (o) { o.classList.remove("on"); });
+          ch.classList.add("on");
+          if (ch.dataset.tip === "custom") { custom.style.display = "inline-block"; custom.focus(); }
+          else { custom.style.display = "none"; hidden.value = ch.dataset.tip; }
+        });
+      });
+      custom.addEventListener("input", function () { hidden.value = custom.value || 0; });
+    }
   }
 
-  /* ---------- write page: tier radios + tip slider ---------- */
+  /* ---------- write page: tier radios ---------- */
   document.querySelectorAll('input[name="tier"]').forEach(function (r) {
     r.addEventListener("change", function () {
       document.querySelectorAll(".tier-radio").forEach(function (o) {
@@ -66,13 +94,6 @@
       });
     });
   });
-  var tip = document.getElementById("f-tip");
-  var tipValue = document.getElementById("tip-value");
-  if (tip && tipValue) {
-    tip.addEventListener("input", function () {
-      tipValue.textContent = "₹" + tip.value;
-    });
-  }
 
   /* ---------- copy caption buttons ---------- */
   document.querySelectorAll(".copy-btn").forEach(function (btn) {

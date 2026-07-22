@@ -1,10 +1,14 @@
 {% extends "base.html" %}
+{% import "_art.html" as art %}
+{% set seals = {'neet-accountability': art.icon_nib(), 'solidarity-humane-treatment': art.icon_lamp(), 'cost-to-families': art.icon_house()} %}
 {% block title %}Write your letter — Janata Ki Baat{% endblock %}
 {% block content %}
 
 <section class="section">
   <div class="kicker">STEP / 01 — PICK YOUR WORDS</div>
-  <h1 style="margin-top:0">Your letter to the Education Ministry</h1>
+  <h1 style="margin-top:0">Your letter to the Education Ministry
+    <span class="city-postmark" id="city-postmark" data-empty="1">{{ art.city_postmark("YOUR CITY") }}</span>
+  </h1>
   <p class="small" style="max-width:720px">
     Three formal letters, drafted to be received, logged and read. Microcopy
     can joke; <strong>letters never do</strong>. Your name and city go on the
@@ -21,6 +25,7 @@
           <label class="tpl-option {% if picked == t.slug %}checked{% endif %}">
             <input type="radio" name="template" value="{{ t.slug }}"
                    {% if picked == t.slug %}checked{% endif %} required>
+            <span class="tpl-seal">{{ seals[t.slug] }}</span>
             <span>
               <span class="tpl-title">{{ t.title }}</span><br>
               <span class="tpl-sub">Subject: {{ t.subject_line }}</span>
@@ -92,13 +97,18 @@
       </div>
 
       <div class="field">
-        <label for="f-tip">Add a chai for the volunteer (optional)</label>
-        <div class="tip-row">
-          <input type="range" id="f-tip" name="tip" min="0" max="500" step="10"
-                 value="{{ values.tip or 0 }}">
-          <span class="tip-value mono" id="tip-value">₹{{ values.tip or 0 }}</span>
+        <label>Add a chai for the volunteer (optional)</label>
+        <div class="chips" id="tip-chips">
+          {% for amt, lbl in [(0, "no chai"), (10, "cutting chai"), (20, "chai + Parle-G"), (50, "full tiffin")] %}
+          <button type="button" class="chip {% if (values.tip or 0)|int == amt %}on{% endif %}"
+                  data-tip="{{ amt }}">₹{{ amt }} <small>{{ lbl }}</small></button>
+          {% endfor %}
+          <button type="button" class="chip" data-tip="custom">custom</button>
+          <input type="number" id="tip-custom" min="0" max="{{ cfg.TIP_MAX }}" step="10"
+                 placeholder="₹" style="display:none;width:90px;">
         </div>
-        <div class="hint">Tips land in the public Letters Fund — they sponsor
+        <input type="hidden" id="f-tip" name="tip" value="{{ values.tip or 0 }}">
+        <div class="hint">Every rupee lands in the public Letters Fund — it posts
           letters for people who can't pay.</div>
       </div>
 
@@ -130,7 +140,8 @@
         <div data-lp="body"></div>
         <div data-lp="para"></div>
         <div data-lp="closer"></div>
-        <p>Yours faithfully,<br><br>
+        <p>Yours faithfully,<br>
+           <span class="hand sig" data-lp="sig">Your Name</span><br>
            <strong data-lp="name2">Your Name</strong><br>
            <span data-lp="city2">Your City</span><br>
            (signed via janatakibaat.in)</p>

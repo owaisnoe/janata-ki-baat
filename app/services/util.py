@@ -1,3 +1,4 @@
+import math
 import secrets
 from datetime import datetime, timedelta, timezone
 
@@ -31,7 +32,8 @@ def _cap_row(for_date=None):
     d = for_date or ist_today()
     row = db.session.get(DailyCap, d)
     if row is None:
-        row = DailyCap(date=d, cap_limit=current_app.config["DAILY_CAP"], used=0)
+        cap_limit = current_app.config["DAILY_CAP"] or 50
+        row = DailyCap(date=d, cap_limit=cap_limit, used=0)
         db.session.add(row)
         db.session.commit()
     return row
@@ -43,7 +45,10 @@ def slots_left():
 
 
 def consume_slot():
-    """Returns True if a slot was taken; False when today's mailbag is full."""
+    """Uncapped when DAILY_CAP<=0 (launch decision, spec §8); the guarded
+    UPDATE below is the re-enable path."""
+    if current_app.config["DAILY_CAP"] <= 0:
+        return True
     row = _cap_row()
     # Guarded UPDATE so two simultaneous orders can't both take the last slot.
     taken = (
@@ -53,6 +58,20 @@ def consume_slot():
     )
     db.session.commit()
     return bool(taken)
+
+
+def promised_post_date():
+    """Honest posts-by date: queue depth / operator pace, skipping Sundays."""
+    queue = Order.query.filter(
+        Order.status.in_(["utr_submitted", "confirmed", "printed"])
+    ).count()
+    days = max(1, math.ceil((queue + 1) / current_app.config["BATCH_PACE"]))
+    d, added = ist_today(), 0
+    while added < days:
+        d += timedelta(days=1)
+        if d.weekday() != 6:  # post offices work Saturdays; Sunday off
+            added += 1
+    return d
 
 
 def release_slot(order):

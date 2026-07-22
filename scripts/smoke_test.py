@@ -99,8 +99,8 @@ def main():
     with app.app_context():
         order = Order.query.filter_by(public_code=code).first()
         check("order in DB", order is not None and order.total == 79)
-        check("slot consumed",
-              db.session.get(DailyCap, ist_today()).used == 1)
+        check("uncapped: no slot row consumed",
+              db.session.get(DailyCap, ist_today()) is None)
         order_id = order.id
 
     r = client.get(f"/pay/{code}")
@@ -193,17 +193,34 @@ def main():
     check("emails in dev outbox (2 received + 1 confirmed + 1 posted)",
           len(mails) >= 4, f"found {len(mails)}")
 
-    # --- cap full -> waitlist ---
+    # --- uncapped default + promised date ---
     with app.app_context():
         row = db.session.get(DailyCap, ist_today())
-        row.used = row.cap_limit
-        db.session.commit()
+        if row:
+            row.used = 10_000
+            db.session.commit()
     form3 = dict(form, email="third@example.com", personal_para="")
     r = client.post("/write", data=form3)
-    check("cap full redirects to waitlist", r.status_code == 302
+    check("uncapped: order accepted past any cap", r.status_code == 302
+          and "/pay/JKB-" in r.headers["Location"])
+    with app.app_context():
+        o = Order.query.filter_by(public_code=code).first()
+        check("promised_date set at confirm", o.promised_date is not None)
+    r = client.get("/write")
+    check("write shows posts-by date", b"posts by" in r.data.lower())
+
+    # --- capped mode still works as the emergency brake ---
+    app.config["DAILY_CAP"] = 1
+    with app.app_context():
+        row = db.session.get(DailyCap, ist_today())
+        row.cap_limit, row.used = 1, 1
+        db.session.commit()
+    r = client.post("/write", data=dict(form3, email="fourth@example.com"))
+    check("capped: redirects to waitlist", r.status_code == 302
           and "waitlist" in r.headers["Location"])
-    r = client.post("/waitlist", data={"email": "third@example.com"})
+    r = client.post("/waitlist", data={"email": "fourth@example.com"})
     check("waitlist capture", r.status_code == 302)
+    app.config["DAILY_CAP"] = 0
 
     print(f"\nALL {PASS} CHECKS PASSED")
 

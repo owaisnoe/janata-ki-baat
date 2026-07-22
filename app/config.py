@@ -22,7 +22,8 @@ class Config:
     UPI_VPA = os.environ.get("UPI_VPA", "")
     UPI_PAYEE_NAME = os.environ.get("UPI_PAYEE_NAME", "Janata Ki Baat")
 
-    DAILY_CAP = int(os.environ.get("DAILY_CAP", "50"))
+    DAILY_CAP = int(os.environ.get("DAILY_CAP", "0"))  # 0 = uncapped
+    BATCH_PACE = int(os.environ.get("BATCH_PACE", "50"))
 
     SMTP_HOST = os.environ.get("SMTP_HOST", "")
     SMTP_PORT = int(os.environ.get("SMTP_PORT", "465"))

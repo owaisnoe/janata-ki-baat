@@ -113,6 +113,8 @@ def confirm(order_id):
     order.status = "confirmed"
     order.confirmed_at = utcnow()
     order.serial_no = next_serial()
+    from ..services.util import promised_post_date
+    order.promised_date = promised_post_date()
     db.session.add(LedgerEntry(type="fee", amount=order.amount,
                                order_ref=order.public_code,
                                note=f"{order.tier} fee"))

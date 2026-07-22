@@ -53,6 +53,9 @@ class Order(db.Model):
     flagged = db.Column(db.Boolean, nullable=False, default=False)
     flag_reason = db.Column(db.String(200), nullable=True)
 
+    # Honest posts-by date, computed from queue depth at admin confirm time.
+    promised_date = db.Column(db.Date, nullable=True)
+
     created_at = db.Column(db.DateTime, nullable=False, default=utcnow)
     utr_at = db.Column(db.DateTime, nullable=True)
     confirmed_at = db.Column(db.DateTime, nullable=True)

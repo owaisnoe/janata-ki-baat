@@ -18,7 +18,7 @@ from ..extensions import db, limiter
 from ..models import LedgerEntry, LetterTemplate, Order, WaitlistEntry
 from ..moderation import PERSONAL_PARA_MAX, check_personal_para
 from ..services import mailer, payments, pdf, sharecard
-from ..services.util import consume_slot, gen_public_code, ist_now
+from ..services.util import consume_slot, gen_public_code, ist_now, promised_post_date
 
 bp = Blueprint("public", __name__)
 
@@ -87,6 +87,7 @@ def _render_write(templates, picked, values, errors, status_code=200):
         "write.html", templates=templates, picked=picked,
         values=values, errors=errors, para_max=PERSONAL_PARA_MAX,
         tpl_json=tpl_json, today_str=ist_now().strftime("%d %B %Y"),
+        eta=promised_post_date(),
     ), status_code
 
 

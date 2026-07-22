@@ -1,0 +1,20 @@
+{% from "emails/_base.html" import email_shell %}
+{% call email_shell("Your letter is queued — the Letters Fund has you covered.") %}
+  <p>Namaste {{ order.name }},</p>
+  <p>Your letter to the Education Ministry is <strong>queued</strong> as
+  order <strong>{{ order.public_code }}</strong>
+  ({{ order.template.title }}).</p>
+  <p>You asked us to post it from the <strong>Letters Fund</strong> — so
+  there's nothing to pay and nothing you need to do. Your letter goes out as
+  soon as the fund covers it: first asked, first posted. We'll email you the
+  moment it's confirmed.</p>
+  <p style="text-align:center;margin:26px 0;">
+    <a href="{{ status_url }}" style="background:#B93511;color:#F7F3EC;text-decoration:none;
+       font-family:Georgia,'Times New Roman',serif;font-size:17px;padding:13px 26px;
+       border:1px solid #171512;display:inline-block;">TRACK MY LETTER →</a>
+  </p>
+  <p>Then we print, post, photograph and track it — proof lands in this
+  inbox.</p>
+  <p>— Janata Ki Baat<br>
+  <span style="font-size:13px;">Distance is not silence.</span></p>
+{% endcall %}

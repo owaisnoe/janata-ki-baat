@@ -5,10 +5,11 @@
   <strong style="color:#B93511;">Letter #{{ "{:,}".format(order.serial_no) }}</strong>
   to the Education Ministry.</p>
   <p>What happens next: your letter goes into the next print run, gets
-  signed-folded-stuffed, and is <strong>posted within 2 working days</strong>.
+  signed-folded-stuffed, and is
+  {% if order.promised_date %}<strong>posted by {{ order.promised_date.strftime('%d %b %Y') }}</strong>, the date we promised when you ordered{% else %}<strong>posted by the date we promised when you ordered</strong>{% endif %}.
   You'll get the envelope photo{% if order.tier == 'speedpost' %} and India
-  Post tracking number{% endif %} right here. If we blow the 5-day deadline,
-  you're refunded in full, automatically.</p>
+  Post tracking number{% endif %} right here. If it isn't posted within 2
+  working days of that date, you're refunded in full, automatically.</p>
   <p style="text-align:center;margin:26px 0;">
     <a href="{{ status_url }}" style="background:#B93511;color:#F7F3EC;text-decoration:none;
        font-family:Georgia,'Times New Roman',serif;font-size:17px;padding:13px 26px;

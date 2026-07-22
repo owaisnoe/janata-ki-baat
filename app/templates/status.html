@@ -68,6 +68,10 @@
 
   {% if order.status in ('pending_payment',) %}
     <a class="btn" href="{{ url_for('public.pay', code=order.public_code) }}">Finish payment →</a>
+  {% elif order.status == 'utr_submitted' and order.sponsored_request %}
+    <p><strong>You're in the queue.</strong> Your letter goes out as soon as
+       the Letters Fund covers it — first asked, first posted. No payment, no
+       catch. Email lands when it's confirmed.</p>
   {% elif order.status == 'utr_submitted' %}
     <p><strong>UTR received.</strong> We'll match your payment and confirm
        within a few hours — email lands when it flips.</p>

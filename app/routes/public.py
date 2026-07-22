@@ -182,8 +182,8 @@ def write_submit():
         mailer.send_email(
             order.email,
             f"Your letter is queued — {order.public_code}",
-            render_template("emails/order_received.html", order=order,
-                            pay_url=status_url),
+            render_template("emails/sponsored_queued.html", order=order,
+                            status_url=status_url),
         )
         flash("You're in the queue — your letter posts as soon as the "
               "Letters Fund covers it. Watch this page.", "success")

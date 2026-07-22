@@ -204,6 +204,7 @@ def pay(code):
         return redirect(url_for("public.status", code=order.public_code))
     return render_template(
         "pay.html", order=order, upi_uri=payments.upi_uri(order),
+        poster=(_posters() or [None])[0],
     )
 
 

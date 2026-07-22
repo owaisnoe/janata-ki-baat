@@ -106,6 +106,8 @@ def main():
     r = client.get(f"/pay/{code}")
     check("pay page", r.status_code == 200 and b"UPI" in r.data
           and code.encode() in r.data)
+    check("stamp-frame QR", b"stamp-frame" in r.data)
+    check("share moment on pay", b"Tell one person" in r.data)
     r = client.get(f"/pay/{code}/qr.png")
     check("UPI QR", r.status_code == 200 and r.data[:8] == b"\x89PNG\r\n\x1a\n")
 

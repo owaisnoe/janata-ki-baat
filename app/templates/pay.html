@@ -4,14 +4,14 @@
 
 <section class="section">
   <div class="kicker">STEP / 02 — PAY THE STAMP</div>
-  <h1 style="margin-top:0">₹{{ order.total }} and you're in the mailbag</h1>
-  <p class="small">Order <span class="pay-code">{{ order.public_code }}</span> ·
+  <h1 style="margin-top:0"><span class="pay-amount">₹{{ order.total }}</span> and you're in the mailbag</h1>
+  <p class="small">Order <span class="slip">{{ order.public_code }}</span> ·
     {{ TIERS[order.tier].label }} ₹{{ order.amount }}{% if order.tip %} +
     ₹{{ order.tip }} chai{% endif %} · unpaid orders expire in 24 hours.</p>
 
   <div class="pay-box" style="margin-top:26px">
     <div>
-      <div class="qr-frame">
+      <div class="qr-frame stamp-frame">
         <img src="{{ url_for('public.pay_qr', code=order.public_code) }}"
              alt="UPI QR code for ₹{{ order.total }}">
       </div>
@@ -23,7 +23,7 @@
       <ol class="pay-steps">
         <li>Scan the QR (or tap the button on your phone). Amount:
           <strong>₹{{ order.total }}</strong> exactly.</li>
-        <li>Keep <span class="pay-code">{{ order.public_code }}</span> in the
+        <li>Keep <span class="slip">{{ order.public_code }}</span> in the
           payment note — it's how we match you.</li>
         <li>After paying, your UPI app shows a 12-digit
           <strong>UTR / reference number</strong>. Paste it below.</li>
@@ -46,6 +46,13 @@
         Write to {{ cfg.OPERATOR_CONTACT }}.</p>
     </div>
   </div>
+
+  {% if poster %}
+  <div class="poster" data-poster-id="{{ poster.id }}" data-caption="{{ poster.caption }}" style="max-width:340px;margin-top:26px;">
+    <span class="share-tag">TAP TO SHARE ↗</span>
+    <h5>Your letter is being matched.<br><span style="color:var(--verm-deep);">Tell one person while you wait.</span></h5>
+  </div>
+  {% endif %}
 </section>
 
 {% endblock %}

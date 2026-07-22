@@ -285,8 +285,14 @@ section.band .step p { font-size: 15px; font-weight: 500; line-height: 1.6; colo
 @media (max-width: 760px) { .pay-box { grid-template-columns: 1fr; } }
 .qr-frame { background: #fff; border: 3px solid var(--ink); padding: 14px; box-shadow: 6px 6px 0 var(--ink); }
 .qr-frame img { display: block; width: 260px; height: 260px; }
-.pay-amount { font-family: 'Playfair Display', serif; font-size: 54px; color: var(--ink-soft); }
-.pay-code { font-family: 'IBM Plex Mono', monospace; background: var(--paper-deep); border: 2px solid var(--ink); padding: 4px 10px; font-weight: 600; }
+.stamp-frame { border: 2px dashed var(--verm-deep); outline: 6px solid #fff;
+  outline-offset: -8px; background: #fff; padding: 18px; border-radius: 3px;
+  box-shadow: 0 14px 40px rgba(23,21,18,.14); width: fit-content; }
+.pay-amount { font-family: 'Playfair Display', serif; font-weight: 900;
+  font-size: clamp(40px, 6vw, 54px); color: var(--verm-deep); }
+.slip { font-family: 'IBM Plex Mono', monospace; background: var(--paper-deep);
+  border: 1px solid var(--hair); padding: 6px 12px; font-weight: 600;
+  letter-spacing: .06em; display: inline-block; }
 .pay-steps li { margin-bottom: 8px; }
 
 /* --- status page timeline --- */

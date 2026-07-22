@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Janata Ki Baat — mockup v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;0,900;1,600&family=Caveat:wght@600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F7F3EC; --paper-deep: #EFE7D8; --ink: #171512; --ink-soft: #2A2622;
+    --verm: #E2401B; --verm-deep: #B93511; --stone: #6E675C;
+    --hair: rgba(23,21,18,.18);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--paper); color: var(--ink);
+    font-family: Inter, sans-serif; -webkit-font-smoothing: antialiased; }
+  body::after { content:""; position: fixed; inset: 0; pointer-events: none; opacity: .3; z-index: 5;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.09 0 0 0 0 0.08 0 0 0 0 0.07 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+  .hand { font-family: 'Caveat', cursive; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px; }
+
+  /* tricolour postal edge — saffron & india-green, letterpress-muted */
+  .airmail { height: 5px; background: repeating-linear-gradient(-45deg,
+    #E07C1F 0 14px, var(--paper) 14px 24px, #2E7D32 24px 38px, var(--paper) 38px 48px); opacity: .9; }
+
+  /* masthead */
+  .mast { text-align: center; padding: 24px 16px 14px; border-bottom: 3px double var(--hair); }
+  .mast-grid { max-width: 1080px; margin: 0 auto; display: grid;
+    grid-template-columns: 130px 1fr 130px; align-items: center; gap: 10px; }
+  .ear { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .ear .cap { font-family:'IBM Plex Mono',monospace; font-size: 9.5px; font-weight: 600;
+    letter-spacing: .18em; color: var(--stone); }
+  .mast .over { font-family:'IBM Plex Mono',monospace; font-size: 11px; font-weight: 600;
+    letter-spacing: .24em; color: var(--verm-deep); }
+  .mast .over .star { color: var(--ink); }
+  .mast h1 { font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(40px, 8vw, 76px);
+    margin: 6px 0 4px; }
+  .mast .under { font-family:'IBM Plex Mono',monospace; font-size: 11px; letter-spacing: .26em; color: var(--ink-soft); }
+  .ornament { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 14px; }
+  .ornament .line { height: 1px; background: var(--hair); flex: 0 1 180px; }
+  .mast nav { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 10px 26px; justify-content: center;
+    font-size: 12px; font-weight: 600; letter-spacing: .1em; font-family:'IBM Plex Mono',monospace; }
+  .mast nav a { color: var(--ink); text-decoration: none; border-bottom: 2px solid transparent; padding-bottom: 2px; }
+  .mast nav a:hover { border-color: var(--verm); }
+  @media (max-width: 760px) { .mast-grid { grid-template-columns: 1fr; } .ear { display: none; } }
+
+  /* ticker */
+  .ticker { border-bottom: 1px solid var(--hair); overflow: hidden; background: var(--paper-deep); }
+  .ticker .track { display: inline-flex; white-space: nowrap; animation: tick 55s linear infinite; padding: 10px 0; }
+  .ticker span { font-family:'IBM Plex Mono',monospace; font-size: 12px; font-weight: 600; letter-spacing: .18em;
+    color: var(--ink-soft); margin-right: 3.5em; }
+  .ticker b { color: var(--verm-deep); }
+  @keyframes tick { to { transform: translateX(-33.33%); } }
+
+  /* hero */
+  .hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 44px; align-items: center; padding: 50px 0 38px; }
+  .kicker { font-family:'IBM Plex Mono',monospace; font-size: 11.5px; font-weight: 600; letter-spacing: .22em;
+    color: var(--verm-deep); margin-bottom: 18px; }
+  .hero h2 { font-family: 'Playfair Display', serif; font-weight: 600; font-size: clamp(32px, 5.4vw, 58px);
+    line-height: 1.12; margin: 0 0 22px; }
+  .hero h2 .quiet { color: var(--ink-soft); font-style: italic; }
+  .hero h2 .loud { font-weight: 900; position: relative; }
+  .hero h2 .loud svg { position: absolute; left: 0; bottom: -10px; width: 100%; height: 14px; }
+  .hero p.sub { font-size: clamp(16px, 2vw, 18px); font-weight: 500; line-height: 1.65; color: var(--ink-soft);
+    max-width: 480px; margin: 0 0 30px; }
+  .btn { display: inline-block; background: var(--ink); color: var(--paper); text-decoration: none;
+    font-weight: 700; font-size: 16px; padding: 15px 30px; border-radius: 3px; border: 1.5px solid var(--ink);
+    transition: transform .18s ease, box-shadow .18s ease; }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(23,21,18,.22); }
+  .btn.verm { background: var(--verm-deep); border-color: var(--verm-deep); }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; }
+  .stats { display: flex; flex-wrap: wrap; gap: 20px 36px; margin-top: 34px; }
+  .stats > div { font-family:'IBM Plex Mono',monospace; font-size: 12px; font-weight: 500; color: var(--ink-soft); }
+  .stats b { display: block; font-family: 'Playfair Display', serif; font-size: 26px; color: var(--ink); margin-bottom: 2px; }
+  .stats .verm b { color: var(--verm-deep); }
+
+  .env-scene { display: flex; justify-content: center; min-width: 0; }
+  .env { background: #FBF8F2; border: 1px solid var(--hair); border-radius: 3px; width: min(400px, 100%);
+    padding: 24px 26px 20px; position: relative;
+    box-shadow: 0 18px 50px rgba(23,21,18,.15), 0 2px 6px rgba(23,21,18,.06); transform: rotate(-2.5deg); }
+  .env .to { font-size: clamp(20px, 2.6vw, 24px); line-height: 1.35; }
+  .env .stampbox { position: absolute; top: 16px; right: 20px; }
+  .env .postmark { position: absolute; top: 6px; right: 100px; opacity: .9; }
+
+  /* fuel strip (dark live news desk) */
+  .fuel { background: var(--ink); color: var(--paper); padding: 0; border-block: 3px solid var(--verm-deep); }
+  .fuel .deskhead { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: center;
+    padding: 12px 0 10px; border-bottom: 1px solid rgba(247,243,236,.14); }
+  .fuel .lbl { font-family:'IBM Plex Mono',monospace; font-size: 11.5px; font-weight: 600; letter-spacing: .22em; color: var(--verm); }
+  .live { display: inline-flex; align-items: center; gap: 7px; font-family:'IBM Plex Mono',monospace;
+    font-size: 10.5px; font-weight: 600; letter-spacing: .2em; color: var(--paper);
+    border: 1px solid rgba(247,243,236,.35); border-radius: 2px; padding: 3px 9px; }
+  .live .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--verm); animation: pulse 1.6s ease infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.75); } }
+  .fuel .upd { font-family:'IBM Plex Mono',monospace; font-size: 10.5px; letter-spacing: .12em; color: #9C948A; margin-left: auto; }
+  .newswire { overflow: hidden; padding: 12px 0 13px; }
+  .newswire .track { display: inline-flex; white-space: nowrap; animation: tick 48s linear infinite; }
+  .newswire:hover .track { animation-play-state: paused; }
+  .newswire .item { margin-right: 4em; font-size: 14.5px; font-weight: 500; }
+  .newswire .d { font-family:'IBM Plex Mono',monospace; color: var(--verm); font-size: 11.5px; margin-right: 8px; letter-spacing: .08em; }
+  .newswire a { color: var(--paper); text-decoration: none; border-bottom: 1px solid rgba(247,243,236,.35); padding-bottom: 1px; }
+  .newswire a:hover { border-color: var(--verm); }
+  .newswire .src { font-family:'IBM Plex Mono',monospace; font-size: 10.5px; color: #9C948A; margin-left: 8px; letter-spacing: .1em; }
+
+  /* manifesto plate */
+  .plate-band { padding: 42px 0 50px; }
+  .plate { background: var(--paper-deep); border: 1px solid var(--hair); border-radius: 3px;
+    box-shadow: inset 0 0 0 6px var(--paper-deep), inset 0 0 0 7px var(--hair);
+    padding: clamp(26px, 5vw, 48px); max-width: 780px; margin: 0 auto; }
+  .plate .k { text-align: center; margin-bottom: 20px; }
+  .plate p { font-family: 'Playfair Display', serif; font-size: clamp(19px, 2.6vw, 24px); line-height: 1.55;
+    margin: 0 0 14px; color: var(--ink); text-align: center; }
+  .plate p b { font-weight: 900; }
+  .plate .mono-line { text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600;
+    color: var(--verm-deep); letter-spacing: .06em; }
+
+  /* sections */
+  section.band { border-top: 1px solid var(--hair); padding: 54px 0; }
+  .band h3 { font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(26px, 3.6vw, 34px); margin: 6px 0 28px; }
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 30px; }
+  .step { border-left: 2px solid var(--hair); padding-left: 18px; }
+  .step .n { font-family:'IBM Plex Mono',monospace; font-size: 11px; font-weight: 600; letter-spacing: .22em;
+    color: var(--verm-deep); margin: 12px 0 6px; }
+  .step h4 { font-family:'Playfair Display',serif; font-size: 21px; margin: 0 0 8px; font-weight: 800; }
+  .step p { font-size: 15px; font-weight: 500; line-height: 1.6; color: var(--ink-soft); margin: 0; }
+
+  /* tiers */
+  .tiers { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+  .tier { background: #FBF8F2; border: 1px solid var(--hair); border-radius: 3px; padding: 24px 22px;
+    position: relative; display: flex; flex-direction: column; transition: transform .18s, box-shadow .18s; }
+  .tier:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(23,21,18,.12); }
+  .tier.hero-tier { border: 1.5px solid var(--verm-deep); }
+  .tier .tag { position: absolute; top: -11px; left: 18px; background: var(--verm-deep); color: var(--paper);
+    font-family:'IBM Plex Mono',monospace; font-size: 10px; font-weight: 600; letter-spacing: .14em; padding: 3px 10px; border-radius: 2px; }
+  .tier .tag.inkbg { background: var(--ink); }
+  .tier h4 { font-family:'Playfair Display',serif; font-weight: 800; font-size: 22px; margin: 6px 0 0; }
+  .tier .price { font-family:'Playfair Display',serif; font-weight: 900; font-size: 42px; color: var(--verm-deep); }
+  .tier .brk { font-family:'IBM Plex Mono',monospace; font-size: 11.5px; color: var(--stone); margin: 6px 0 10px; }
+  .tier p { font-size: 14.5px; font-weight: 500; line-height: 1.6; color: var(--ink-soft); margin: 0 0 16px; flex: 1; }
+
+  /* mailbag (dark proof band) */
+  .mailbag { background: var(--ink); color: var(--paper); padding: 56px 0; }
+  .mailbag h3 { color: var(--paper); }
+  .mailbag .k { color: var(--verm); }
+  .shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px; }
+  .shot { border-radius: 4px; overflow: hidden; position: relative; min-height: 150px;
+    background: linear-gradient(125deg, #241f1a, #4a4238 60%, #6E675C); }
+  .shot .tint { position: absolute; inset: 0; background: linear-gradient(125deg, rgba(226,64,27,.28), transparent 65%); }
+  .shot .envmini { position: absolute; left: 16px; top: 26px; width: 130px; height: 80px; background: var(--paper);
+    border-radius: 2px; transform: rotate(-4deg); padding: 8px; box-shadow: 0 8px 20px rgba(0,0,0,.5); }
+  .shot .cap { position: absolute; right: 12px; bottom: 10px; font-family:'IBM Plex Mono',monospace; font-size: 10.5px;
+    font-weight: 600; letter-spacing: .12em; color: var(--paper); }
+  .mailbag .note { margin-top: 18px; font-size: 14.5px; color: #CFC8BC; font-weight: 500; }
+
+  /* posters */
+  .posters { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+  .poster { background: #FBF8F2; border: 1px solid var(--hair); border-radius: 3px; padding: 24px 20px; min-height: 140px;
+    position: relative; cursor: pointer; transition: transform .18s ease, box-shadow .18s ease; }
+  .poster:hover { transform: translateY(-4px) rotate(-.4deg); box-shadow: 0 14px 34px rgba(23,21,18,.16); }
+  .poster .share-tag { position: absolute; top: 10px; right: 12px; font-family:'IBM Plex Mono',monospace; font-size: 10px;
+    font-weight: 600; letter-spacing: .14em; color: var(--verm-deep); }
+  .poster.dark { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .poster h5 { font-family:'Playfair Display',serif; font-size: 21px; font-weight: 800; line-height: 1.25; margin: 0; }
+
+  /* sponsor */
+  .sponsor { display: flex; flex-wrap: wrap; align-items: center; gap: 30px 40px; }
+  .sponsor .txt { flex: 1; min-width: 260px; }
+  .sponsor p { max-width: 560px; font-size: 15.5px; font-weight: 500; line-height: 1.65; color: var(--ink-soft); margin: 0 0 18px; }
+
+  footer { border-top: 3px double var(--hair); padding: 28px 0 40px; text-align: center; }
+  footer p { font-size: 13px; font-weight: 500; color: var(--ink-soft); max-width: 580px; margin: 0 auto; line-height: 1.7; }
+
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; gap: 36px; padding: 40px 0 44px; }
+    .env-scene { order: 2; }
+    .env { transform: rotate(-1.5deg); }
+    section.band, .plate-band, .mailbag { padding: 42px 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="airmail"></div>
+<header class="mast">
+  <div class="mast-grid">
+    <div class="ear">
+      <svg width="58" height="74" viewBox="0 0 58 74" fill="none" stroke="#171512" stroke-width="1.3">
+        <path d="M14 26 a15 15 0 0 1 30 0 v34 h-30 z"/>
+        <path d="M14 26 h30" stroke-width="0.9"/>
+        <rect x="21" y="33" width="16" height="3.5" fill="#B93511" stroke="none"/>
+        <path d="M10 60 h38 M12 64 h34" stroke-width="1"/>
+        <path d="M20 68 h18" stroke-width="1.6"/>
+        <text x="29" y="52" text-anchor="middle" font-family="IBM Plex Mono" font-size="6.5" fill="#171512" stroke="none">डाक</text>
+      </svg>
+      <span class="cap">POST BOX No. 1</span>
+    </div>
+    <div>
+      <div class="over"><span class="star">✦</span> FROM THE STUDENTS · FOR THE STUDENTS <span class="star">✦</span></div>
+      <h1>Janata Ki Baat</h1>
+      <div class="under">THE PEOPLE'S POST · VOL. 1 · NEW DELHI VIA EVERYWHERE</div>
+    </div>
+    <div class="ear">
+      <svg width="86" height="64" viewBox="0 0 86 64" fill="none">
+        <circle cx="52" cy="32" r="26" stroke="#171512" stroke-width="1.2"/>
+        <circle cx="52" cy="32" r="20.5" stroke="#171512" stroke-width="0.7"/>
+        <text x="52" y="29" text-anchor="middle" font-family="IBM Plex Mono" font-size="7.5" fill="#171512">NEW DELHI</text>
+        <text x="52" y="40" text-anchor="middle" font-family="IBM Plex Mono" font-size="7" fill="#171512">110 001</text>
+        <path d="M2 22 q10 -5 20 0 M2 32 q10 -5 20 0 M2 42 q10 -5 20 0" stroke="#171512" stroke-width="1" opacity=".7"/>
+      </svg>
+      <span class="cap">DULY POSTMARKED</span>
+    </div>
+  </div>
+  <div class="ornament">
+    <div class="line"></div>
+    <svg width="26" height="18" viewBox="0 0 26 18" fill="none" stroke="#B93511" stroke-width="1.3">
+      <rect x="1.5" y="1.5" width="23" height="15" rx="1"/>
+      <path d="M1.5 2.5 L13 11 L24.5 2.5"/>
+    </svg>
+    <div class="line"></div>
+  </div>
+  <nav>
+    <a href="#">WRITE A LETTER</a><a href="#">SPONSOR</a><a href="#">LEDGER</a><a href="#">DIY KIT</a><a href="#">ABOUT</a>
+  </nav>
+</header>
+
+<div class="ticker"><div class="track">
+  <span><b>1,247</b> LETTERS AND COUNTING</span><span>A LETTER IS A PROTEST THAT NEEDS NO PERMIT</span><span>DISTANCE IS NOT SILENCE</span><span>POSTED · PHOTOGRAPHED · TRACKED</span>
+  <span><b>1,247</b> LETTERS AND COUNTING</span><span>A LETTER IS A PROTEST THAT NEEDS NO PERMIT</span><span>DISTANCE IS NOT SILENCE</span><span>POSTED · PHOTOGRAPHED · TRACKED</span>
+  <span><b>1,247</b> LETTERS AND COUNTING</span><span>A LETTER IS A PROTEST THAT NEEDS NO PERMIT</span><span>DISTANCE IS NOT SILENCE</span><span>POSTED · PHOTOGRAPHED · TRACKED</span>
+</div></div>
+
+<div class="wrap">
+  <div class="hero">
+    <div>
+      <div class="kicker">THE REPLY — FILED UNDER: DEMOCRATIC PAPERWORK</div>
+      <h2>
+        <span class="quiet">Every month, it's Mann&nbsp;Ki&nbsp;Baat.</span><br>
+        This month, <span class="loud">it's Janata&nbsp;Ki&nbsp;Baat.
+          <svg viewBox="0 0 300 14" preserveAspectRatio="none"><path d="M3 9 Q75 3 150 8 T297 6" stroke="#E2401B" stroke-width="4.5" fill="none" stroke-linecap="round"/></svg>
+        </span>
+      </h2>
+      <p class="sub">Can't be at Jantar Mantar? Be in the mailbag. We print, post &amp; prove your letter to the Education Ministry — you pay what the stamp costs.</p>
+      <div class="cta-row">
+        <a class="btn verm" href="#">Post my letter →</a>
+        <a class="btn ghost" href="#">Free DIY kit</a>
+      </div>
+      <div class="stats">
+        <div><b>1,247</b>letters on the record</div>
+        <div class="verm"><b>₹59</b>is all it takes</div>
+        <div><b>2 days</b>to the mailbag</div>
+      </div>
+    </div>
+
+    <div class="env-scene">
+      <div class="env">
+        <div class="stampbox">
+          <svg width="52" height="62" viewBox="0 0 52 62" fill="none">
+            <rect x="1.5" y="1.5" width="49" height="59" stroke="#B93511" stroke-width="1.6" stroke-dasharray="4 4"/>
+            <path d="M13 38 c0-8 6-16 13-20 c7 4 13 12 13 20 c-7 4 -19 4 -26 0 z" stroke="#B93511" stroke-width="1.4"/>
+            <text x="26" y="52" text-anchor="middle" font-family="IBM Plex Mono" font-size="7" fill="#B93511">INDIA · ₹41</text>
+          </svg>
+        </div>
+        <div class="postmark">
+          <svg width="74" height="74" viewBox="0 0 76 76" fill="none">
+            <circle cx="38" cy="38" r="34" stroke="#171512" stroke-width="1.3"/>
+            <circle cx="38" cy="38" r="27" stroke="#171512" stroke-width="0.8"/>
+            <text x="38" y="35" text-anchor="middle" font-family="IBM Plex Mono" font-size="8.5" fill="#171512">POSTED</text>
+            <text x="38" y="47" text-anchor="middle" font-family="IBM Plex Mono" font-size="7.5" fill="#171512">22 JUL 2026</text>
+          </svg>
+        </div>
+        <div class="to hand">
+          To,<br>
+          The Union Minister of Education,<br>
+          Shastri Bhawan, New Delhi — 110 001
+        </div>
+        <div style="margin-top:16px; display:flex; justify-content:space-between; align-items:flex-end;">
+          <svg width="110" height="24" viewBox="0 0 120 26" fill="none"><path d="M4 18 q18 -12 36 -2 t38 -4 t38 2" stroke="#171512" stroke-width="1.1" opacity=".55"/></svg>
+          <span class="mono" style="font-size:10px;color:#6E675C;">JKB-1247 · SPEED POST</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="fuel">
+  <div class="wrap">
+    <div class="deskhead">
+      <span class="live"><span class="dot"></span>LIVE</span>
+      <span class="lbl">TODAY'S FUEL — SOURCED, NOT RUMOURED</span>
+      <span class="upd">UPDATED 22 JUL · 09:00 IST</span>
+    </div>
+  </div>
+  <div class="newswire"><div class="track">
+    <span class="item"><span class="d">21 JUL</span><a href="#">Youth movement vows to continue protests after police crackdown</a><span class="src">NPR</span></span>
+    <span class="item"><span class="d">20 JUL</span><a href="#">Thousands march on Parliament; ~180 injured in police action</a><span class="src">AL JAZEERA</span></span>
+    <span class="item"><span class="d">20 JUL</span><a href="#">Government makes first outreach to protesting students</a><span class="src">NBC</span></span>
+    <span class="item"><span class="d">18 JUL</span><a href="#">Sonam Wangchuk hospitalised on day 21 of hunger strike</a><span class="src">WIRE REPORTS</span></span>
+    <span class="item"><span class="d">JUN</span><a href="#">NEET-UG 2026 cancelled after confirmed paper leak; CBI inquiry ordered</a><span class="src">NBC</span></span>
+    <span class="item"><span class="d">21 JUL</span><a href="#">Youth movement vows to continue protests after police crackdown</a><span class="src">NPR</span></span>
+    <span class="item"><span class="d">20 JUL</span><a href="#">Thousands march on Parliament; ~180 injured in police action</a><span class="src">AL JAZEERA</span></span>
+    <span class="item"><span class="d">20 JUL</span><a href="#">Government makes first outreach to protesting students</a><span class="src">NBC</span></span>
+    <span class="item"><span class="d">18 JUL</span><a href="#">Sonam Wangchuk hospitalised on day 21 of hunger strike</a><span class="src">WIRE REPORTS</span></span>
+    <span class="item"><span class="d">JUN</span><a href="#">NEET-UG 2026 cancelled after confirmed paper leak; CBI inquiry ordered</a><span class="src">NBC</span></span>
+    <span class="item"><span class="d">21 JUL</span><a href="#">Youth movement vows to continue protests after police crackdown</a><span class="src">NPR</span></span>
+    <span class="item"><span class="d">20 JUL</span><a href="#">Thousands march on Parliament; ~180 injured in police action</a><span class="src">AL JAZEERA</span></span>
+    <span class="item"><span class="d">20 JUL</span><a href="#">Government makes first outreach to protesting students</a><span class="src">NBC</span></span>
+    <span class="item"><span class="d">18 JUL</span><a href="#">Sonam Wangchuk hospitalised on day 21 of hunger strike</a><span class="src">WIRE REPORTS</span></span>
+    <span class="item"><span class="d">JUN</span><a href="#">NEET-UG 2026 cancelled after confirmed paper leak; CBI inquiry ordered</a><span class="src">NBC</span></span>
+  </div></div>
+</div>
+
+<div class="wrap plate-band">
+  <div class="plate">
+    <div class="k kicker" style="margin-bottom:16px;">THE PREMISE — FILED UNDER: DEMOCRATIC PAPERWORK</div>
+    <p>Every month, one man talks to 140 crore people. Nobody mails him back — not because there's nothing to say, but because envelopes are effort.</p>
+    <p><b>We are the effort.</b></p>
+    <p>You click. We print, stamp, queue, post, photograph, track. Your words land in Shastri Bhawan as a matter of record.</p>
+    <div class="mono-line">That's it. That's the service. The rest is postage. ✍</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="band">
+    <div class="kicker">HOW IT WORKS</div>
+    <h3>Three steps. Then it's on the record.</h3>
+    <div class="steps">
+      <div class="step">
+        <svg width="42" height="42" viewBox="0 0 44 44" fill="none" stroke="#171512" stroke-width="1.4">
+          <path d="M8 34 L30 12 l6 6 L14 40 l-8 2 z"/><path d="M27 15 l6 6" stroke="#B93511"/></svg>
+        <div class="n">STEP / 01</div><h4>Pick your words</h4>
+        <p>Three formal letters, drafted to be received, logged and read. Add your name, your city, and a paragraph of your own.</p>
+      </div>
+      <div class="step">
+        <svg width="42" height="42" viewBox="0 0 44 44" fill="none" stroke="#171512" stroke-width="1.4">
+          <rect x="6" y="8" width="24" height="30" rx="1"/><path d="M12 16 h12 M12 22 h12 M12 28 h7"/>
+          <rect x="24" y="4" width="14" height="17" stroke="#B93511" stroke-dasharray="3 3"/></svg>
+        <div class="n">STEP / 02</div><h4>Pay the stamp</h4>
+        <p>₹59 Speed Post or ₹19 ePost, itemised to the paisa on a public ledger. Postage, not politics.</p>
+      </div>
+      <div class="step">
+        <svg width="42" height="42" viewBox="0 0 44 44" fill="none" stroke="#171512" stroke-width="1.4">
+          <circle cx="22" cy="22" r="16"/><path d="M14 22 l6 6 l11 -12" stroke="#B93511" stroke-width="1.8"/></svg>
+        <div class="n">STEP / 03</div><h4>We post &amp; prove it</h4>
+        <p>Your envelope photographed at the counter, with an India Post tracking number. Impossible to un-receive.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="kicker">THE TIERS — COSTS PUBLIC, ALWAYS</div>
+    <h3>Pick your postage.</h3>
+    <div class="tiers">
+      <div class="tier hero-tier">
+        <span class="tag">MOST PROOF</span>
+        <h4>Speed Post</h4><div class="price">₹59</div>
+        <div class="brk">₹41.30 postage + ₹5 print + ₹13 ops</div>
+        <p>Physical letter, envelope photo at the counter, India Post tracking number, delivery-status link.</p>
+        <a class="btn verm" style="text-align:center;" href="#">Post my letter →</a>
+      </div>
+      <div class="tier">
+        <span class="tag inkbg">BUDGET</span>
+        <h4>ePost</h4><div class="price" style="color:var(--ink);">₹19</div>
+        <div class="brk">₹10/page India Post ePost + ₹9 buffer</div>
+        <p>India Post prints &amp; delivers; submission receipt as proof. Same record, smaller stamp.</p>
+        <a class="btn ghost" style="text-align:center;" href="#">Post my letter →</a>
+      </div>
+      <div class="tier">
+        <span class="tag inkbg">FREE</span>
+        <h4>DIY Kit</h4><div class="price" style="color:var(--ink);">₹0</div>
+        <div class="brk">You print it. A ₹5 stamp does the rest.</div>
+        <p>All three letters + posting instructions, ready to print. Zero-rupee participation still counts.</p>
+        <a class="btn ghost" style="text-align:center;" href="#">Get the kit →</a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="mailbag">
+  <div class="wrap">
+    <div class="kicker k">FROM THE MAILBAG — EVERY BATCH, PHOTOGRAPHED</div>
+    <h3>The proof wall.</h3>
+    <div class="shots">
+      <div class="shot"><div class="tint"></div><div class="envmini"></div><div class="cap">BATCH #4 · 43 LETTERS</div></div>
+      <div class="shot"><div class="tint"></div><div class="envmini" style="transform:rotate(3deg);left:30px;top:34px;"></div><div class="cap">BATCH #3 · 51 LETTERS</div></div>
+      <div class="shot"><div class="tint"></div><div class="envmini" style="transform:rotate(-7deg);left:22px;"></div><div class="cap">BATCH #2 · 38 LETTERS</div></div>
+    </div>
+    <p class="note">Real photos from real post-office counters, added daily. Sender names masked; the record public. <a href="#" style="color:var(--paper);">See the ledger →</a></p>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="band" style="border-top:none;">
+    <div class="kicker">SPREAD THE WORD — TAP A CARD, IT'S YOURS TO POST</div>
+    <h3>Loud looks good on you.</h3>
+    <div class="posters">
+      <div class="poster">
+        <span class="share-tag">TAP TO SHARE ↗</span>
+        <h5>Can't march?<br><span style="color:#B93511;">Mail.</span></h5>
+        <div class="hand" style="font-size:21px;margin-top:12px;color:#2A2622;">— 2 minutes. ₹59. On the record.</div>
+      </div>
+      <div class="poster dark">
+        <span class="share-tag">TAP TO SHARE ↗</span>
+        <h5 style="font-style:italic;font-weight:600;">"Mann Ki Baat sunn li.<br>Janata Ki Baat bhej di."</h5>
+        <div class="mono" style="font-size:11px;letter-spacing:.18em;margin-top:14px;color:#E2401B;">JANATAKIBAAT.IN 📮</div>
+      </div>
+      <div class="poster">
+        <span class="share-tag">TAP TO SHARE ↗</span>
+        <h5>1,247 letters can't be scrolled past.</h5>
+        <div class="hand" style="font-size:21px;margin-top:12px;color:#2A2622;">— yours makes 1,248</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="sponsor">
+      <svg width="104" height="104" viewBox="0 0 110 110" fill="none">
+        <circle cx="55" cy="55" r="50" fill="#E2401B" opacity=".1"/>
+        <circle cx="55" cy="55" r="42" stroke="#B93511" stroke-width="1.5"/>
+        <circle cx="55" cy="55" r="36" stroke="#B93511" stroke-width="0.8" stroke-dasharray="3 3"/>
+        <text x="55" y="50" text-anchor="middle" font-family="Playfair Display" font-weight="800" font-size="15" fill="#B93511">₹59</text>
+        <text x="55" y="66" text-anchor="middle" font-family="IBM Plex Mono" font-size="7.5" fill="#B93511">SPONSOR A LETTER</text>
+      </svg>
+      <div class="txt">
+        <div class="kicker">THE LETTERS FUND</div>
+        <h3 style="margin-bottom:10px;">Post someone else's anger.</h3>
+        <p>Not everyone who wants on the record can spare ₹59 — hostel months are long. Sponsor one letter or five; every rupee sits in a public fund, every sponsored letter lands on the ledger. <b style="color:var(--ink);">163 sponsored so far.</b></p>
+        <a class="btn" style="margin:0" href="#">Sponsor letters →</a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <p>An independent citizen initiative. Not affiliated with the Cockroach Janta Party, any political party,
+  or the Government of India. We mail your words; the words are yours.<br><br>
+  <span class="mono" style="letter-spacing:.18em;font-size:10.5px;color:#B93511;">SATIRE IN THE MARGINS · DEAD SERIOUS IN THE MAIL</span></p>
+</footer>
+
+</body>
+</html>

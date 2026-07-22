@@ -1,0 +1,129 @@
+{# SVG art macro library — all decorative, wrapped with aria-hidden #}
+
+{# Postbox ear (left side of masthead) #}
+{% macro postbox_ear() %}
+<svg aria-hidden="true" width="58" height="74" viewBox="0 0 58 74" fill="none" stroke="#171512" stroke-width="1.3">
+  <path d="M14 26 a15 15 0 0 1 30 0 v34 h-30 z"/>
+  <path d="M14 26 h30" stroke-width="0.9"/>
+  <rect x="21" y="33" width="16" height="3.5" fill="#B93511" stroke="none"/>
+  <path d="M10 60 h38 M12 64 h34" stroke-width="1"/>
+  <path d="M20 68 h18" stroke-width="1.6"/>
+  <text x="29" y="52" text-anchor="middle" font-family="IBM Plex Mono" font-size="6.5" fill="#171512">डाक</text>
+</svg>
+{% endmacro %}
+
+{# Postmark ear (right side of masthead) #}
+{% macro postmark_ear() %}
+<svg aria-hidden="true" width="86" height="64" viewBox="0 0 86 64" fill="none">
+  <circle cx="52" cy="32" r="26" stroke="#171512" stroke-width="1.2"/>
+  <circle cx="52" cy="32" r="20.5" stroke="#171512" stroke-width="0.7"/>
+  <text x="52" y="29" text-anchor="middle" font-family="IBM Plex Mono" font-size="7.5" fill="#171512">NEW DELHI</text>
+  <text x="52" y="40" text-anchor="middle" font-family="IBM Plex Mono" font-size="7" fill="#171512">110 001</text>
+  <path d="M2 22 q10 -5 20 0 M2 32 q10 -5 20 0 M2 42 q10 -5 20 0" stroke="#171512" stroke-width="1" opacity=".7"/>
+</svg>
+{% endmacro %}
+
+{# Envelope ornament in masthead #}
+{% macro envelope_ornament() %}
+<svg aria-hidden="true" width="26" height="18" viewBox="0 0 26 18" fill="none" stroke="#B93511" stroke-width="1.3">
+  <rect x="1.5" y="1.5" width="23" height="15" rx="1"/>
+  <path d="M1.5 2.5 L13 11 L24.5 2.5"/>
+</svg>
+{% endmacro %}
+
+{# Postage stamp #}
+{% macro stamp() %}
+<svg aria-hidden="true" width="52" height="62" viewBox="0 0 52 62" fill="none">
+  <rect x="1.5" y="1.5" width="49" height="59" stroke="#B93511" stroke-width="1.6" stroke-dasharray="4 4"/>
+  <path d="M13 38 c0-8 6-16 13-20 c7 4 13 12 13 20 c-7 4 -19 4 -26 0 z" stroke="#B93511" stroke-width="1.4"/>
+  <text x="26" y="52" text-anchor="middle" font-family="IBM Plex Mono" font-size="7" fill="#B93511">INDIA · ₹41</text>
+</svg>
+{% endmacro %}
+
+{# Postmark with customizable top and bottom text #}
+{% macro postmark(top="POSTED", bottom="") %}
+<svg aria-hidden="true" width="74" height="74" viewBox="0 0 76 76" fill="none">
+  <circle cx="38" cy="38" r="34" stroke="#171512" stroke-width="1.3"/>
+  <circle cx="38" cy="38" r="27" stroke="#171512" stroke-width="0.8"/>
+  <text x="38" y="35" text-anchor="middle" font-family="IBM Plex Mono" font-size="8.5" fill="#171512">{{ top }}</text>
+  <text x="38" y="47" text-anchor="middle" font-family="IBM Plex Mono" font-size="7.5" fill="#171512">{{ bottom }}</text>
+</svg>
+{% endmacro %}
+
+{# City postmark (derived from postmark macro) #}
+{% macro city_postmark(city) %}{{ postmark(city|upper|truncate(12, True, ""), "2026") }}{% endmacro %}
+
+{# Hand-drawn underline accent #}
+{% macro hand_underline() %}
+<svg aria-hidden="true" viewBox="0 0 300 14" preserveAspectRatio="none"><path d="M3 9 Q75 3 150 8 T297 6" stroke="#E2401B" stroke-width="4.5" fill="none" stroke-linecap="round"/></svg>
+{% endmacro %}
+
+{# Seal with big and small circle layers #}
+{% macro seal(big=1, small=1) %}
+<svg aria-hidden="true" width="104" height="104" viewBox="0 0 110 110" fill="none">
+  {% if big %}
+  <circle cx="55" cy="55" r="50" fill="#E2401B" opacity=".1"/>
+  <circle cx="55" cy="55" r="42" stroke="#B93511" stroke-width="1.5"/>
+  {% endif %}
+  {% if small %}
+  <circle cx="55" cy="55" r="36" stroke="#B93511" stroke-width="0.8" stroke-dasharray="3 3"/>
+  {% endif %}
+  <text x="55" y="50" text-anchor="middle" font-family="Playfair Display" font-weight="800" font-size="15" fill="#B93511">₹59</text>
+  <text x="55" y="66" text-anchor="middle" font-family="IBM Plex Mono" font-size="7.5" fill="#B93511">SPONSOR A LETTER</text>
+</svg>
+{% endmacro %}
+
+{# Icon: nib (for "Pick your words" step) #}
+{% macro icon_nib() %}
+<svg aria-hidden="true" width="42" height="42" viewBox="0 0 44 44" fill="none" stroke="#171512" stroke-width="1.4">
+  <path d="M8 34 L30 12 l6 6 L14 40 l-8 2 z"/><path d="M27 15 l6 6" stroke="#B93511"/>
+</svg>
+{% endmacro %}
+
+{# Icon: letter (for "Pay the stamp" step) #}
+{% macro icon_letter() %}
+<svg aria-hidden="true" width="42" height="42" viewBox="0 0 44 44" fill="none" stroke="#171512" stroke-width="1.4">
+  <rect x="6" y="8" width="24" height="30" rx="1"/><path d="M12 16 h12 M12 22 h12 M12 28 h7"/>
+  <rect x="24" y="4" width="14" height="17" stroke="#B93511" stroke-dasharray="3 3"/>
+</svg>
+{% endmacro %}
+
+{# Icon: check (for "We post & prove it" step) #}
+{% macro icon_check() %}
+<svg aria-hidden="true" width="42" height="42" viewBox="0 0 44 44" fill="none" stroke="#171512" stroke-width="1.4">
+  <circle cx="22" cy="22" r="16"/><path d="M14 22 l6 6 l11 -12" stroke="#B93511" stroke-width="1.8"/>
+</svg>
+{% endmacro %}
+
+{# Icon: lamp (for knowledge/education theme) #}
+{% macro icon_lamp() %}
+<svg aria-hidden="true" width="42" height="42" viewBox="0 0 44 44" fill="none" stroke="#171512" stroke-width="1.4">
+  <path d="M22 6 c5 6 5 12 0 16 c-5 -4 -5 -10 0 -16 z" stroke="#B93511"/>
+  <path d="M14 26 h16 M12 32 h20 M18 38 h8 M22 22 v4"/>
+</svg>
+{% endmacro %}
+
+{# Icon: house (for home/address theme) #}
+{% macro icon_house() %}
+<svg aria-hidden="true" width="42" height="42" viewBox="0 0 44 44" fill="none" stroke="#171512" stroke-width="1.4">
+  <path d="M8 22 L22 8 L36 22"/><path d="M12 20 v16 h20 v-16"/>
+  <rect x="19" y="26" width="6" height="10" stroke="#B93511"/>
+</svg>
+{% endmacro %}
+
+{# Icon: mailbag (for collection/delivery theme) #}
+{% macro icon_mailbag() %}
+<svg aria-hidden="true" width="42" height="42" viewBox="0 0 44 44" fill="none" stroke="#171512" stroke-width="1.4">
+  <path d="M12 16 q10 -10 20 0 v2 q-10 4 -20 0 z"/><path d="M10 20 c-2 10 2 18 12 18 s14 -8 12 -18"/>
+  <path d="M17 27 h10" stroke="#B93511"/>
+</svg>
+{% endmacro %}
+
+{# Icon: bhawan (for government building/ministry theme) #}
+{% macro icon_bhawan() %}
+<svg aria-hidden="true" width="42" height="42" viewBox="0 0 44 44" fill="none" stroke="#171512" stroke-width="1.4">
+  <path d="M6 38 h32 M8 38 v-14 h28 v14 M12 24 v-6 h20 v6"/>
+  <path d="M14 38 v-8 M20 38 v-8 M26 38 v-8 M32 38 v-8" stroke-width="1"/>
+  <path d="M22 18 v-6 l5 2 v2 l-5 0" stroke="#B93511"/>
+</svg>
+{% endmacro %}

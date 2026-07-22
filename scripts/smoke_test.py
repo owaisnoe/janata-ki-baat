@@ -63,6 +63,10 @@ def main():
         check(f"no maroon {hexcode} in css", hexcode not in css)
     check("tokens present", "--verm-deep" in css and "#F7F3EC" in css)
 
+    # --- Task 2: SVG art macro library ---
+    r = client.get("/")
+    check("art macros render", b"aria-hidden" in r.data and b"<svg" in r.data)
+
     # --- write flow ---
     form = {
         "template": "neet-accountability",

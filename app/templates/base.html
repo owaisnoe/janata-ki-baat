@@ -16,19 +16,14 @@
 </head>
 <body>
 
+{% import "_art.html" as art %}
+
 <div class="airmail" aria-hidden="true"></div>
 
 <header class="mast">
   <div class="mast-grid">
     <div class="ear">
-      <svg width="58" height="74" viewBox="0 0 58 74" fill="none" stroke="#171512" stroke-width="1.3">
-        <path d="M14 26 a15 15 0 0 1 30 0 v34 h-30 z"/>
-        <path d="M14 26 h30" stroke-width="0.9"/>
-        <rect x="21" y="33" width="16" height="3.5" fill="#B93511" stroke="none"/>
-        <path d="M10 60 h38 M12 64 h34" stroke-width="1"/>
-        <path d="M20 68 h18" stroke-width="1.6"/>
-        <text x="29" y="52" text-anchor="middle" font-family="IBM Plex Mono" font-size="6.5" fill="#171512">डाक</text>
-      </svg>
+      {{ art.postbox_ear() }}
       <span class="cap">POST BOX No. 1</span>
     </div>
     <div>
@@ -37,22 +32,13 @@
       <div class="under">THE PEOPLE'S POST · VOL. 1 · NEW DELHI VIA EVERYWHERE</div>
     </div>
     <div class="ear">
-      <svg width="86" height="64" viewBox="0 0 86 64" fill="none">
-        <circle cx="52" cy="32" r="26" stroke="#171512" stroke-width="1.2"/>
-        <circle cx="52" cy="32" r="20.5" stroke="#171512" stroke-width="0.7"/>
-        <text x="52" y="29" text-anchor="middle" font-family="IBM Plex Mono" font-size="7.5" fill="#171512">NEW DELHI</text>
-        <text x="52" y="40" text-anchor="middle" font-family="IBM Plex Mono" font-size="7" fill="#171512">110 001</text>
-        <path d="M2 22 q10 -5 20 0 M2 32 q10 -5 20 0 M2 42 q10 -5 20 0" stroke="#171512" stroke-width="1" opacity=".7"/>
-      </svg>
+      {{ art.postmark_ear() }}
       <span class="cap">DULY POSTMARKED</span>
     </div>
   </div>
   <div class="ornament">
     <div class="line"></div>
-    <svg width="26" height="18" viewBox="0 0 26 18" fill="none" stroke="#B93511" stroke-width="1.3">
-      <rect x="1.5" y="1.5" width="23" height="15" rx="1"/>
-      <path d="M1.5 2.5 L13 11 L24.5 2.5"/>
-    </svg>
+    {{ art.envelope_ornament() }}
     <div class="line"></div>
   </div>
   <nav>

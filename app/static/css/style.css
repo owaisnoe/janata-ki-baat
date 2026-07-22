@@ -53,9 +53,9 @@ a { color: var(--verm-deep); }
 
 /* --- flashes --- */
 .flashes { max-width: 900px; margin: 18px auto 0; padding: 0 20px; }
-.flash { border: 2px solid var(--ink); padding: 12px 16px; margin-bottom: 10px; font-weight: 500; background: var(--paper-deep); }
-.flash-error { background: #F6D5D5; border-color: var(--verm-deep); }
-.flash-success { background: #DEE9D2; }
+.flash { border: 1px solid var(--hair); padding: 12px 16px; margin-bottom: 10px; font-weight: 500; background: var(--paper-deep); }
+.flash-error { background: #F3DBD3; border-color: var(--verm-deep); }
+.flash-success { background: #E4EAD9; }
 
 /* --- layout helpers --- */
 main { min-height: 55vh; }
@@ -215,9 +215,9 @@ section.band .step p { font-size: 15px; font-weight: 500; line-height: 1.6; colo
 }
 
 /* --- FAQ --- */
-.faq details { border: 2px solid var(--ink); background: var(--paper); margin-bottom: 10px; }
+.faq details { border: 1px solid var(--hair); background: var(--paper); margin-bottom: 10px; }
 .faq summary { cursor: pointer; font-weight: 600; padding: 14px 18px; font-size: 16px; }
-.faq details[open] summary { border-bottom: 2px solid var(--ink); background: var(--paper-deep); }
+.faq details[open] summary { border-bottom: 1px solid var(--hair); background: var(--paper-deep); }
 .faq .answer { padding: 14px 18px; }
 
 /* --- forms --- */
@@ -226,7 +226,7 @@ section.band .step p { font-size: 15px; font-weight: 500; line-height: 1.6; colo
 .field input[type=text], .field input[type=email], .field input[type=tel],
 .field textarea, .field select {
   width: 100%; font-family: inherit; font-size: 16px; color: var(--ink);
-  background: #fffdf6; border: 2px solid var(--ink); padding: 12px 14px;
+  background: #fffdf6; border: 1px solid var(--hair); padding: 12px 14px;
 }
 .field textarea { min-height: 96px; resize: vertical; }
 .field .hint { font-size: 13px; color: var(--ink-soft); margin-top: 4px; }
@@ -367,7 +367,7 @@ section.band .step p { font-size: 15px; font-weight: 500; line-height: 1.6; colo
 
 /* --- ledger --- */
 .ledger-totals { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
-.ledger-card { border: 2px solid var(--ink); background: var(--paper-deep); padding: 18px; }
+.ledger-card { border: 1px solid var(--hair); background: var(--card); padding: 18px; }
 .ledger-card .amt { font-family: 'Playfair Display', serif; font-size: 30px; }
 .ledger-card .lbl { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
 table.ledger-table, table.admin-table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
@@ -388,14 +388,14 @@ footer p { font-size: 13px; font-weight: 500; color: var(--ink-soft); max-width:
 
 /* --- admin --- */
 .admin-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
-.admin-tabs a { font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-decoration: none; color: var(--ink); border: 2px solid var(--ink); padding: 7px 13px; background: var(--paper); }
+.admin-tabs a { font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-decoration: none; color: var(--ink); border: 1px solid var(--hair); padding: 7px 13px; background: var(--paper); }
 .admin-tabs a.active { background: var(--ink); color: var(--paper); }
 .badge { display: inline-block; background: var(--verm-deep); color: var(--paper); font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 1px 7px; border-radius: 9px; margin-left: 5px; }
-.flag { background: #F6D5D5; border: 2px solid var(--verm-deep); padding: 10px 14px; font-size: 14px; margin: 10px 0; }
+.flag { background: #F3DBD3; border: 1px solid var(--verm-deep); padding: 10px 14px; font-size: 14px; margin: 10px 0; }
 .admin-actions form { display: inline-block; margin-right: 8px; }
 
 /* --- states / misc --- */
-.full-banner { background: var(--ink-soft); color: var(--paper); border: 3px solid var(--ink); padding: 22px 26px; max-width: 700px; }
+.full-banner { background: var(--ink-soft); color: var(--paper); border: 1.5px solid var(--hair); padding: 22px 26px; max-width: 700px; }
 .center { text-align: center; }
 .small { font-size: 14px; }
 .spacer { height: 18px; }

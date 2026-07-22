@@ -181,6 +181,7 @@ def main():
     # --- ledger totals ---
     r = client.get("/ledger")
     check("ledger shows entries", r.status_code == 200 and code.encode() in r.data)
+    check("ledger fund card", b"LETTERS FUND" in r.data)
 
     # --- moderation flag ---
     form2 = dict(form, email="second@example.com",

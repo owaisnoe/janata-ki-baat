@@ -4,8 +4,8 @@
 <section class="section" style="max-width:860px">
   <div class="kicker"><a href="{{ url_for('admin.queue') }}">← QUEUE</a> / {{ order.public_code }}</div>
   <h1 style="margin-top:0">{{ order.name }}, {{ order.city }}
-    {% if order.serial_no %}<span style="color:var(--stamp-red)">#{{ order.serial_no }}</span>{% endif %}
-    {% if order.sponsored_request %}<span class="mono" style="color:var(--stamp-red-dark);font-size:0.6em">FUND</span>{% endif %}</h1>
+    {% if order.serial_no %}<span style="color:var(--verm-deep)">#{{ order.serial_no }}</span>{% endif %}
+    {% if order.sponsored_request %}<span class="mono" style="color:var(--verm-deep);font-size:0.6em">FUND</span>{% endif %}</h1>
   <p class="small mono">
     {{ order.status }} · {{ order.tier }} ₹{{ order.amount }} + tip ₹{{ order.tip }}
     · {{ order.email }}{% if order.phone %} · {{ order.phone }}{% endif %}

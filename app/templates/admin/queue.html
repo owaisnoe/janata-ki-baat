@@ -9,7 +9,7 @@
     slots left today: {{ slots_left() }} ·
     waitlist: {{ waitlist_count }} ·
     fund ₹{{ "%.2f"|format(fund) }}
-    {% if flagged_count %} · <span style="color:var(--stamp-red-dark)">⚑ {{ flagged_count }} flagged for review</span>{% endif %}
+    {% if flagged_count %} · <span style="color:var(--verm-deep)">⚑ {{ flagged_count }} flagged for review</span>{% endif %}
     · <a href="{{ url_for('admin.export_csv') }}">export CSV</a>
     · <a href="{{ url_for('admin.logout') }}">logout</a>
   </p>

@@ -1,16 +1,22 @@
 {% extends "base.html" %}
+{% import "_art.html" as art %}
 {% block title %}{% if order.serial_no %}Letter #{{ "{:,}".format(order.serial_no) }}{% else %}Your letter{% endif %} — Janata Ki Baat{% endblock %}
 {% block content %}
 
 <section class="section">
   <div class="kicker">ON THE RECORD — {{ order.public_code }}</div>
-  {% if order.serial_no %}
-    <h1 style="margin-top:0">Letter #{{ "{:,}".format(order.serial_no) }}</h1>
-  {% else %}
-    <h1 style="margin-top:0">Your letter</h1>
-  {% endif %}
-  <p class="small">{{ order.template.title }} ·
-     {{ TIERS[order.tier].label }} · {{ order.name }}, {{ order.city }}</p>
+  <div class="ownership">
+    <div>
+      {% if order.serial_no %}
+        <h1 style="margin-top:0">Letter #{{ "{:,}".format(order.serial_no) }} — {{ order.name.split(' ')[0] }}'s letter to the Education Ministry</h1>
+      {% else %}
+        <h1 style="margin-top:0">Your letter to the Education Ministry</h1>
+      {% endif %}
+      <p class="small">{{ order.template.title }} ·
+         {{ TIERS[order.tier].label }} · {{ order.name }}, {{ order.city }}</p>
+    </div>
+    <div class="ownership-mark">{{ art.city_postmark(order.city.split(',')[0]) }}</div>
+  </div>
 
   {% if order.status == 'expired' %}
     <div class="full-banner"><h3 style="margin-top:0">This order expired.</h3>
@@ -31,17 +37,30 @@
   ] %}
   {% set reached = {'pending_payment': 1, 'utr_submitted': 1, 'confirmed': 2,
                     'printed': 3, 'posted': 4, 'delivered': 5}[order.status] %}
-  <ul class="timeline">
+  {% set icons = [art.icon_nib(), art.icon_letter(), art.icon_mailbag(), art.icon_check(), art.icon_bhawan()] %}
+
+  {% if order.is_paid %}
+  <div class="postmark-thunk" data-thunk="{{ order.public_code }}">{{ art.postmark("POSTED", (order.posted_at or order.confirmed_at).strftime("%d %b %Y")|upper) }}</div>
+  <p class="mono small">You are letter #{{ "{:,}".format(order.serial_no) }} of a mailbag that can't be scrolled past.</p>
+  {% endif %}
+
+  {% if order.promised_date and order.status not in ('posted', 'delivered') %}
+  <p class="mono small">Promised in the mail by {{ order.promised_date.strftime('%d %b %Y') }}.</p>
+  {% endif %}
+
+  <ul class="journey">
     {% for label, detail in states %}
     <li class="{% if loop.index <= reached %}done{% endif %}">
-      <span class="dot">{% if loop.index <= reached %}✓{% endif %}</span>
-      <div class="step-name">{{ label }}</div>
-      <div class="step-detail">
-        {% if loop.index == 1 %}{{ detail }}
-        {% elif loop.index == 2 and order.confirmed_at %}{{ order.confirmed_at.strftime('%d %b %Y') }} — {{ detail }}
-        {% elif loop.index == 4 and order.posted_at %}{{ order.posted_at.strftime('%d %b %Y') }} — {{ detail }}
-        {% elif loop.index == 5 and order.delivered_at %}{{ order.delivered_at.strftime('%d %b %Y') }}
-        {% else %}{{ detail }}{% endif %}
+      {{ icons[loop.index0] }}
+      <div class="step-body">
+        <div class="step-name">{{ label }}</div>
+        <div class="step-detail">
+          {% if loop.index == 1 %}{{ detail }}
+          {% elif loop.index == 2 and order.confirmed_at %}{{ order.confirmed_at.strftime('%d %b %Y') }} — {{ detail }}
+          {% elif loop.index == 4 and order.posted_at %}{{ order.posted_at.strftime('%d %b %Y') }} — {{ detail }}
+          {% elif loop.index == 5 and order.delivered_at %}{{ order.delivered_at.strftime('%d %b %Y') }}
+          {% else %}{{ detail }}{% endif %}
+        </div>
       </div>
     </li>
     {% endfor %}
@@ -66,8 +85,12 @@
   {% if order.proof_filename %}
   <div class="spacer"></div>
   <div class="kicker">THE PROOF</div>
-  <img class="proof-photo" src="{{ url_for('public.proof_photo', code=order.public_code) }}"
-       alt="Envelope photographed at the post office">
+  <figure class="proof-mount">
+    <img src="{{ url_for('public.proof_photo', code=order.public_code) }}"
+         alt="Your envelope, photographed at the post office counter before it went in the mail">
+    <span class="mount tl"></span><span class="mount tr"></span>
+    <span class="mount bl"></span><span class="mount br"></span>
+  </figure>
   <p class="small">Only people with this link see the full photo. The public
      wall shows it with your name masked.</p>
   {% endif %}
@@ -79,10 +102,12 @@
   {% if order.is_paid %}
   <hr class="rule" style="margin:34px 0">
   <div class="kicker">STEP / 04 — SHOW IT OFF</div>
-  <div class="share-cards">
-    <a href="{{ url_for('public.share_card', code=order.public_code) }}" download>
+  <div class="posters share-posters">
+    <a class="poster" href="{{ url_for('public.share_card', code=order.public_code) }}" download>
+      <span class="share-tag">SQUARE ↓</span>
       <img src="{{ url_for('public.share_card', code=order.public_code) }}" alt="Square share card"></a>
-    <a href="{{ url_for('public.share_card', code=order.public_code, fmt='story') }}" download>
+    <a class="poster" href="{{ url_for('public.share_card', code=order.public_code, fmt='story') }}" download>
+      <span class="share-tag">STORY ↓</span>
       <img src="{{ url_for('public.share_card', code=order.public_code, fmt='story') }}" alt="Story share card"></a>
   </div>
   <div class="spacer"></div>

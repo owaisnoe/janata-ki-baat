@@ -295,18 +295,59 @@ section.band .step p { font-size: 15px; font-weight: 500; line-height: 1.6; colo
   letter-spacing: .06em; display: inline-block; }
 .pay-steps li { margin-bottom: 8px; }
 
-/* --- status page timeline --- */
-.timeline { list-style: none; padding: 0; margin: 30px 0; max-width: 640px; }
-.timeline li { position: relative; padding: 0 0 26px 42px; border-left: 3px solid var(--ink); margin-left: 12px; }
-.timeline li:last-child { border-left-color: transparent; }
-.timeline .dot {
-  position: absolute; left: -14px; top: 0; width: 25px; height: 25px; border-radius: 50%;
-  background: var(--paper); border: 3px solid var(--ink); font-size: 13px; line-height: 20px; text-align: center;
+/* --- status page: ownership header --- */
+.ownership { display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 20px 30px; flex-wrap: wrap; }
+.ownership > div:first-child { flex: 1; min-width: 260px; }
+.ownership-mark { flex-shrink: 0; transform: rotate(-6deg); opacity: .9; }
+@media (max-width: 620px) { .ownership-mark { display: none; } }
+
+/* --- status page: envelope's journey --- */
+.journey { list-style: none; padding: 0; margin: 26px 0; max-width: 620px; }
+.journey li { display: flex; gap: 16px; align-items: flex-start;
+  padding: 0 0 22px 0; border-left: 0; position: relative; }
+.journey li::before { content: ""; position: absolute; left: 20px; top: 44px;
+  bottom: -2px; width: 1.5px; background: var(--hair); }
+.journey li:last-child::before { display: none; }
+.journey li svg { flex-shrink: 0; background: var(--card);
+  border: 1.5px solid var(--hair); border-radius: 50%; padding: 8px;
+  width: 42px; height: 42px; }
+.journey li.done svg { border-color: var(--verm-deep); stroke: var(--verm-deep); }
+.journey .step-body { padding-top: 4px; }
+.journey .step-name { font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+  font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+.journey li.done .step-name { color: var(--verm-deep); }
+.journey .step-detail { font-size: 14px; color: var(--ink-soft); }
+
+/* postmark thunk — drops onto a paid order once per session */
+.postmark-thunk { display: inline-block; }
+.postmark-thunk.play { animation: thunk .45s cubic-bezier(.2, 2.2, .4, 1) both; }
+@keyframes thunk {
+  0% { transform: scale(2.4) rotate(-18deg); opacity: 0; }
+  60% { transform: scale(.94) rotate(-7deg); opacity: 1; }
+  100% { transform: scale(1) rotate(-8deg); opacity: 1; }
 }
-.timeline li.done .dot { background: var(--verm-deep); border-color: var(--ink); color: var(--paper); }
-.timeline li.done .step-name { font-weight: 700; }
-.timeline .step-name { font-family: 'IBM Plex Mono', monospace; letter-spacing: .06em; text-transform: uppercase; font-size: 14px; }
-.timeline .step-detail { font-size: 14px; color: var(--ink-soft); }
+
+/* mounted duotone proof */
+.proof-mount { margin: 0; display: inline-block; position: relative; padding: 14px;
+  background: var(--card); border: 1px solid var(--hair);
+  box-shadow: 0 14px 40px rgba(23,21,18,.14); }
+.proof-mount img { display: block; max-width: 100%;
+  filter: grayscale(1) contrast(1.05); }
+.proof-mount::after { content: ""; position: absolute; inset: 14px;
+  background: linear-gradient(125deg, rgba(226,64,27,.22), transparent 60%);
+  pointer-events: none; }
+.proof-mount .mount { position: absolute; width: 16px; height: 16px;
+  border: 1.5px solid var(--verm-deep); pointer-events: none; }
+.proof-mount .mount.tl { top: 6px; left: 6px; border-right: 0; border-bottom: 0; }
+.proof-mount .mount.tr { top: 6px; right: 6px; border-left: 0; border-bottom: 0; }
+.proof-mount .mount.bl { bottom: 6px; left: 6px; border-right: 0; border-top: 0; }
+.proof-mount .mount.br { bottom: 6px; right: 6px; border-left: 0; border-top: 0; }
+
+/* share poster grid (status page) */
+.share-posters { max-width: 620px; margin: 18px 0; }
+.share-posters .poster { padding: 14px; display: block; text-decoration: none; }
+.share-posters .poster img { display: block; width: 100%; border: 1px solid var(--hair); }
 
 /* postmark stamp */
 .postmark {

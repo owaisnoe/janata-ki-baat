@@ -162,6 +162,9 @@ def main():
     r = client.get(f"/letter/{code}")
     check("status shows proof + tracking", b"EK123456789IN" in r.data
           and b"THE PROOF" in r.data)
+    check("ownership header", b"letter to the Education Ministry" in r.data)
+    check("journey timeline", b"journey" in r.data)
+    check("thunk animation hook", b"postmark-thunk" in r.data)
     r = client.get(f"/letter/{code}/proof")
     check("proof photo served", r.status_code == 200)
     r = client.get(f"/letter/{code}/letter.pdf")

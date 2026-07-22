@@ -126,6 +126,17 @@
     }
   }
 
+  /* ---------- status: postmark thunk, once per order ---------- */
+  var thunk = document.querySelector(".postmark-thunk[data-thunk]");
+  if (thunk) {
+    var key = "jkb-thunk-" + thunk.dataset.thunk;
+    if (!sessionStorage.getItem(key)
+        && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      sessionStorage.setItem(key, "1");
+      requestAnimationFrame(function () { thunk.classList.add("play"); });
+    }
+  }
+
   /* ---------- hide UPI intent button on desktop ---------- */
   var upiBtn = document.getElementById("upi-intent");
   if (upiBtn && !/Android|iPhone|iPad/i.test(navigator.userAgent)) {

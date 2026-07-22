@@ -67,6 +67,15 @@ def main():
     r = client.get("/")
     check("art macros render", b"aria-hidden" in r.data and b"<svg" in r.data)
 
+    # --- Task 3: home page v5 order ---
+    r = client.get("/")
+    check("hero slogan", b"Mann&nbsp;Ki&nbsp;Baat" in r.data
+          and b"Janata&nbsp;Ki&nbsp;Baat" in r.data)
+    check("live news desk", b"LIVE" in r.data and b"SOURCED, NOT RUMOURED" in r.data)
+    check("no slots scarcity on home", b"slots" not in r.data.lower())
+    check("posters on home", b"TAP TO SHARE" in r.data)
+    check("sponsor band on home", b"Letters Fund" in r.data)
+
     # --- write flow ---
     form = {
         "template": "neet-accountability",

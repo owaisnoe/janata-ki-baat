@@ -1,184 +1,174 @@
 {% extends "base.html" %}
+{% import "_art.html" as art %}
 {% block content %}
+{% set n = letters_count() %}
 
-<section class="section hero">
-  <div class="kicker">REQ / 01 — THE REPLY</div>
-  <h1>Every month, Mann&nbsp;Ki&nbsp;Baat.<br>
-      <span class="flip">This month, Janata&nbsp;Ki&nbsp;Baat.</span></h1>
-  <p class="hero-sub">
-    Can't be at Jantar Mantar? Be in the mailbag. We print, post &amp; prove
-    your letter to the Education Ministry — you pay what the stamp costs.
-  </p>
-  <div class="hero-ctas">
-    <a class="btn" href="{{ url_for('public.write') }}">Post my letter →</a>
-    <a class="btn btn-secondary btn-small" href="{{ url_for('public.diy') }}">Free DIY kit</a>
-  </div>
-  <div class="hero-stats mono">
-    <span><b>{{ "{:,}".format(letters_count()) }}</b> letters and counting</span>
-    <span>Today's slots: <b>{{ slots_left() }}</b> left</span>
-    <span>Posted within <b>2</b> working days — or full refund</span>
-  </div>
-  <div class="cantmarch">Can't march? Mail.</div>
-</section>
+<div class="wrap">
+  <div class="hero">
+    <div>
+      <div class="kicker">THE REPLY — FILED UNDER: DEMOCRATIC PAPERWORK</div>
+      <h2>
+        <span class="quiet">Every month, it's Mann&nbsp;Ki&nbsp;Baat.</span><br>
+        This month, <span class="loud">it's Janata&nbsp;Ki&nbsp;Baat.
+          {{ art.hand_underline() }}
+        </span>
+      </h2>
+      <p class="sub">Can't be at Jantar Mantar? Be in the mailbag. We print, post &amp; prove your letter to the Education Ministry — you pay what the stamp costs.</p>
+      <div class="cta-row">
+        <a class="btn verm" href="{{ url_for('public.write') }}">Post my letter →</a>
+        <a class="btn ghost" href="{{ url_for('public.diy') }}">Free DIY kit</a>
+      </div>
+      <div class="stats">
+        <div><b data-countup="{{ n }}">{{ "{:,}".format(n) }}</b>letters on the record</div>
+        <div class="verm"><b>₹59</b>is all it takes</div>
+        <div><b>2 days</b>to the mailbag</div>
+      </div>
+    </div>
 
-{% if fuel %}
-<div class="fuel">
-  <div class="fuel-inner">
-    <span class="fuel-label">TODAY'S FUEL ─ SOURCED, NOT RUMOURED:</span>
-    {% for item in fuel %}
-      <span><span class="fuel-date">{{ item.date }}</span>
-      <a href="{{ item.url }}" rel="noopener" target="_blank">{{ item.title }}</a></span>
-    {% endfor %}
+    <div class="env-scene">
+      <div class="env">
+        <div class="stampbox">{{ art.stamp() }}</div>
+        <div class="postmark">{{ art.postmark("POSTED", now.strftime("%d %b %Y")|upper) }}</div>
+        <div class="to hand">
+          To,<br>
+          The Union Minister of Education,<br>
+          Shastri Bhawan, New Delhi — 110 001
+        </div>
+        <div style="margin-top:16px; display:flex; justify-content:space-between; align-items:flex-end;">
+          <svg aria-hidden="true" width="110" height="24" viewBox="0 0 120 26" fill="none"><path d="M4 18 q18 -12 36 -2 t38 -4 t38 2" stroke="#171512" stroke-width="1.1" opacity=".55"/></svg>
+          <span class="mono" style="font-size:10px;color:#6E675C;">JKB-{{ n }} · SPEED POST</span>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-{% endif %}
 
-<section class="section">
-  <div class="manifesto">
-    <div class="kicker">THE PREMISE — FILED UNDER: DEMOCRATIC PAPERWORK</div>
-    <p>Every month, one man talks to 140 crore people.</p>
-    <p>Nobody mails him back. Not because there's nothing to say —
-       because envelopes are effort.</p>
-    <p><strong>We are the effort.</strong></p>
-    <p>You click. We print, stamp, queue, post, photograph, track.
-       Your words land in Shastri Bhawan as a matter of record.</p>
-    <p class="mono">That's it. That's the service. The rest is postage.</p>
-  </div>
-</section>
-
-<section class="section section-tight">
-  <div class="kicker">HOW IT WORKS</div>
-  <div class="steps">
-    <div class="step"><div class="num">STEP / 01</div><h3>Pick your words</h3>
-      <p>Choose one of three formal letters. Add your name, your city, and —
-         if you want — a short paragraph of your own.</p></div>
-    <div class="step"><div class="num">STEP / 02</div><h3>Pay the stamp</h3>
-      <p>₹59 Speed Post or ₹19 ePost, itemised down to the paisa. Tips
-         optional; profiteering not on the menu.</p></div>
-    <div class="step"><div class="num">STEP / 03</div><h3>We post &amp; prove it</h3>
-      <p>Your envelope, photographed at the post office counter, with an
-         India Post tracking number. On the record.</p></div>
-    <div class="step"><div class="num">STEP / 04</div><h3>Show it off</h3>
-      <p>A share card with your letter number, ready for your story.
-         Every visible letter recruits the next one.</p></div>
-  </div>
-</section>
-
-<section class="section">
-  <p class="hero-sub" style="max-width:820px">
-    For everyone who watched the march from a hostel bed, an office desk, a
-    night shift, another city: <strong>distance is not silence.</strong>
-    Two minutes and ₹59 puts you on the record.
-  </p>
-</section>
-
-<hr class="rule">
-
-<section class="section" id="tiers">
-  <div class="kicker">THE TIERS — COSTS PUBLIC, ALWAYS</div>
-  <div class="tiers">
-    <div class="tier tier-hero">
-      <span class="tag">THE HERO</span>
-      <h3>Speed Post</h3>
-      <div class="price">₹59</div>
-      <div class="breakdown">{{ TIERS['speedpost'].breakdown }}</div>
-      <p class="promise">{{ TIERS['speedpost'].promise }}</p>
-      <a class="btn btn-small" href="{{ url_for('public.write') }}">Post my letter →</a>
-    </div>
-    <div class="tier">
-      <span class="tag">THE BUDGET</span>
-      <h3>ePost</h3>
-      <div class="price">₹19</div>
-      <div class="breakdown">{{ TIERS['epost'].breakdown }}</div>
-      <p class="promise">{{ TIERS['epost'].promise }}</p>
-      <a class="btn btn-small btn-secondary" href="{{ url_for('public.write') }}">Post my letter →</a>
-    </div>
-    <div class="tier">
-      <span class="tag">THE FREE ONE</span>
-      <h3>DIY kit</h3>
-      <div class="price">₹0</div>
-      <div class="breakdown">You print it. You post it. A ₹5 stamp does the rest.</div>
-      <p class="promise">Ready-to-print PDF with all three letters and
-        posting instructions. Zero-rupee participation is still participation.</p>
-      <a class="btn btn-small btn-secondary" href="{{ url_for('public.diy') }}">Get the kit →</a>
+<div class="fuel">
+  <div class="wrap">
+    <div class="deskhead">
+      <span class="live"><span class="dot" aria-hidden="true"></span>LIVE</span>
+      <span class="lbl">TODAY'S FUEL — SOURCED, NOT RUMOURED</span>
+      <span class="upd">UPDATED {{ fuel.updated_at }}</span>
     </div>
   </div>
-  <p class="small" style="margin-top:18px">
-    <strong>Sponsor a letter:</strong> every tip goes to the public
-    <a href="{{ url_for('public.ledger') }}">Letters Fund</a>, which pays the
-    postage for people who pick "I can't pay". Month-end surplus rolls into
-    the same fund. Money stays boring: printing and postage, never politics.
-  </p>
-</section>
+  <div class="newswire"><div class="track">
+    {% for _ in range(3) %}
+      {% for it in fuel["items"] %}
+      <span class="item"><span class="d">{{ it.date }}</span><a href="{{ it.url }}" rel="noopener" target="_blank">{{ it.title }}</a><span class="src">{{ it.source }}</span></span>
+      {% endfor %}
+    {% endfor %}
+  </div></div>
+</div>
 
-<hr class="rule">
-
-<section class="section" id="faq">
-  <div class="kicker">FAQ — ASKED, ANSWERED</div>
-  <div class="faq">
-    <details>
-      <summary>Are you affiliated with the Cockroach Janta Party?</summary>
-      <div class="answer">No. We're independent people with a printer and
-        stamps. No party — CJP or otherwise — gets your money, your data, or
-        a say in this service.</div>
-    </details>
-    <details>
-      <summary>Will anyone actually read my letter?</summary>
-      <div class="answer">Physical correspondence to a ministry has to be
-        received and logged. One letter is easy to ignore. A mailbag, less
-        so. Volume is the point.</div>
-    </details>
-    <details>
-      <summary>Where does my money go?</summary>
-      <div class="answer">On the <a href="{{ url_for('public.ledger') }}">ledger</a>,
-        down to the paisa. Postage, paper, infrastructure — itemised in
-        public. Look.</div>
-    </details>
-    <details>
-      <summary>Is this even legal?</summary>
-      <div class="answer">Writing a formal letter to a ministry is the most
-        conventional form of civic petitioning there is. Letters stay
-        formal and lawful — our <a href="{{ url_for('public.content_policy') }}">content
-        policy</a> is strict about it: no threats, no abuse, no incitement.</div>
-    </details>
-    <details>
-      <summary>What do you do with my details?</summary>
-      <div class="answer">The minimum, briefly. Name and city go on the
-        letter (that's the point). Email gets you your proof. Postal address
-        is optional and purged 30 days after delivery. Nothing is sold,
-        shared, or kept longer than needed —
-        <a href="{{ url_for('public.privacy') }}">privacy page</a>.</div>
-    </details>
-    <details>
-      <summary>What if you don't post my letter?</summary>
-      <div class="answer">Posted within 2 working days of payment
-        confirmation, or the SLA has been blown and you get a full,
-        automatic refund — <a href="{{ url_for('public.refunds') }}">refund policy</a>.</div>
-    </details>
+<div class="wrap plate-band">
+  <div class="plate">
+    <div class="k kicker" style="margin-bottom:16px;">THE PREMISE — FILED UNDER: DEMOCRATIC PAPERWORK</div>
+    <p>Every month, one man talks to 140 crore people. Nobody mails him back — not because there's nothing to say, but because envelopes are effort.</p>
+    <p><b>We are the effort.</b></p>
+    <p>You click. We print, stamp, queue, post, photograph, track. Your words land in Shastri Bhawan as a matter of record.</p>
+    <div class="mono-line">That's it. That's the service. The rest is postage. ✍</div>
   </div>
-</section>
+</div>
 
-<section class="section section-tight" id="waitlist">
-  {% if slots_left() == 0 %}
-  <div class="full-banner">
-    <h3 style="margin-top:0">Today's mailbag is full.</h3>
-    <p>Tomorrow's is open — leave your email and we'll tell you the moment
-       slots reset.</p>
-  </div>
-  <div class="spacer"></div>
-  {% else %}
-  <div class="kicker">MISS THE MAILBAG?</div>
-  <p class="small" style="max-width:560px">Slots reset daily. If today's cap
-     fills up, leave your email and we'll nudge you when tomorrow's mailbag
-     opens.</p>
-  {% endif %}
-  <form method="post" action="{{ url_for('public.waitlist') }}" class="form-grid" style="max-width:460px">
-    <div class="field">
-      <label for="wl-email">Email</label>
-      <input type="email" id="wl-email" name="email" required placeholder="you@example.com">
+<div class="wrap">
+  <section class="band">
+    <div class="kicker">HOW IT WORKS</div>
+    <h3>Three steps. Then it's on the record.</h3>
+    <div class="steps">
+      <div class="step">
+        {{ art.icon_nib() }}
+        <div class="n">STEP / 01</div><h4>Pick your words</h4>
+        <p>Three formal letters, drafted to be received, logged and read. Add your name, your city, and a paragraph of your own.</p>
+      </div>
+      <div class="step">
+        {{ art.icon_letter() }}
+        <div class="n">STEP / 02</div><h4>Pay the stamp</h4>
+        <p>₹59 Speed Post or ₹19 ePost, itemised to the paisa on a public ledger. Postage, not politics.</p>
+      </div>
+      <div class="step">
+        {{ art.icon_check() }}
+        <div class="n">STEP / 03</div><h4>We post &amp; prove it</h4>
+        <p>Your envelope photographed at the counter, with an India Post tracking number. Impossible to un-receive.</p>
+      </div>
     </div>
-    <button class="btn btn-small" type="submit">Hold my slot →</button>
-  </form>
-</section>
+  </section>
+
+  <section class="band">
+    <div class="kicker">THE TIERS — COSTS PUBLIC, ALWAYS</div>
+    <h3>Pick your postage.</h3>
+    <div class="tiers">
+      <div class="tier hero-tier">
+        <span class="tag">MOST PROOF</span>
+        <h4>Speed Post</h4><div class="price">₹59</div>
+        <div class="brk">{{ TIERS['speedpost'].breakdown }}</div>
+        <p>{{ TIERS['speedpost'].promise }}</p>
+        <a class="btn verm" style="text-align:center;" href="{{ url_for('public.write') }}">Post my letter →</a>
+      </div>
+      <div class="tier">
+        <span class="tag inkbg">BUDGET</span>
+        <h4>ePost</h4><div class="price" style="color:var(--ink);">₹19</div>
+        <div class="brk">{{ TIERS['epost'].breakdown }}</div>
+        <p>{{ TIERS['epost'].promise }}</p>
+        <a class="btn ghost" style="text-align:center;" href="{{ url_for('public.write') }}">Post my letter →</a>
+      </div>
+      <div class="tier">
+        <span class="tag inkbg">FREE</span>
+        <h4>DIY Kit</h4><div class="price" style="color:var(--ink);">₹0</div>
+        <div class="brk">You print it. A ₹5 stamp does the rest.</div>
+        <p>All three letters + posting instructions, ready to print. Zero-rupee participation still counts.</p>
+        <a class="btn ghost" style="text-align:center;" href="{{ url_for('public.diy') }}">Get the kit →</a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="mailbag">
+  <div class="wrap">
+    <div class="kicker k">FROM THE MAILBAG — EVERY BATCH, PHOTOGRAPHED</div>
+    <h3>The proof wall.</h3>
+    <div class="shots">
+      {% if batch_shots %}
+        {% for shot in batch_shots %}
+        <div class="shot"><img src="{{ url_for('static', filename='batches/' + shot.name) }}" alt="" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;"></div>
+        {% endfor %}
+      {% else %}
+        <div class="shot"><div class="tint" aria-hidden="true"></div><div class="envmini" aria-hidden="true"></div><div class="cap">BATCH #4 · 43 LETTERS</div></div>
+        <div class="shot"><div class="tint" aria-hidden="true"></div><div class="envmini" aria-hidden="true" style="transform:rotate(3deg);left:30px;top:34px;"></div><div class="cap">BATCH #3 · 51 LETTERS</div></div>
+        <div class="shot"><div class="tint" aria-hidden="true"></div><div class="envmini" aria-hidden="true" style="transform:rotate(-7deg);left:22px;"></div><div class="cap">BATCH #2 · 38 LETTERS</div></div>
+      {% endif %}
+    </div>
+    <p class="note">Real photos from real post-office counters, added daily. Sender names masked; the record public. <a href="{{ url_for('public.ledger') }}" style="color:var(--paper);">See the ledger →</a></p>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="band" style="border-top:none;">
+    <div class="kicker">SPREAD THE WORD — TAP A CARD, IT'S YOURS TO POST</div>
+    <h3>Loud looks good on you.</h3>
+    <div class="posters">
+      {% for p in posters %}
+      <div class="poster{% if p.theme == 'dark' %} dark{% endif %}" data-poster-id="{{ p.id }}" data-caption="{{ p.caption }}">
+        <span class="share-tag">TAP TO SHARE ↗</span>
+        <h5>
+          {% for line in p.headline.split('|') %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}
+        </h5>
+        {% if p.hand_line %}<div class="hand" style="font-size:21px;margin-top:12px;">{{ p.hand_line }}</div>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="band" id="sponsor">
+    <div class="sponsor">
+      {{ art.seal() }}
+      <div class="txt">
+        <div class="kicker">THE LETTERS FUND</div>
+        <h3 style="margin-bottom:10px;">Post someone else's anger.</h3>
+        <p>Not everyone who wants on the record can spare ₹59 — hostel months are long. Sponsor one letter or five; every rupee sits in the public Letters Fund, every sponsored letter lands on the ledger. <b style="color:var(--ink);">0 sponsored so far.</b></p>
+        <a class="btn" style="margin:0" href="{{ url_for('public.index') }}#sponsor">Sponsor letters →</a>
+      </div>
+    </div>
+  </section>
+</div>
 
 {% endblock %}

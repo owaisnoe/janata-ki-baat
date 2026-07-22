@@ -1,0 +1,8 @@
+[
+  {"id": "cant-march", "headline": "Can't march?|Mail.", "hand_line": "— 2 minutes. ₹59. On the record.", "theme": "light",
+   "caption": "Can't march? Mail. 2 minutes and ₹59 puts you on the record. janatakibaat.in #JanataKiBaat"},
+  {"id": "sunn-li", "headline": "\"Mann Ki Baat sunn li.|Janata Ki Baat bhej di.\"", "hand_line": "", "theme": "dark",
+   "caption": "Mann Ki Baat sunn li. Janata Ki Baat bhej di. 📮 janatakibaat.in"},
+  {"id": "mailbag-count", "headline": "{count} letters|can't be scrolled past.", "hand_line": "— yours makes {next}", "theme": "light",
+   "caption": "{count} letters to the Education Ministry can't be scrolled past. Yours makes {next}. janatakibaat.in"}
+]

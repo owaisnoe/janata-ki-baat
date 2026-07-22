@@ -110,4 +110,18 @@
   if (upiBtn && !/Android|iPhone|iPad/i.test(navigator.userAgent)) {
     upiBtn.style.display = "none";
   }
+
+  /* ---------- home: counter tick-up, once per view ---------- */
+  document.querySelectorAll("[data-countup]").forEach(function (el) {
+    var target = parseInt(el.dataset.countup.replace(/,/g, ""), 10);
+    if (!target || sessionStorage.getItem("jkb-counted")) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    sessionStorage.setItem("jkb-counted", "1");
+    var start = Math.max(0, target - 40), cur = start;
+    var t = setInterval(function () {
+      cur += Math.ceil((target - cur) / 8) || 1;
+      el.textContent = cur.toLocaleString("en-IN");
+      if (cur >= target) clearInterval(t);
+    }, 40);
+  });
 })();

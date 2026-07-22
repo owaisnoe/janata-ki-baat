@@ -38,7 +38,24 @@ def _fuel():
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
+        return {"updated_at": "", "items": []}
+
+
+def _posters():
+    path = Path(current_app.root_path) / "data" / "posters.json"
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
         return []
+    from ..services.util import letters_count
+    n = letters_count()
+    out = []
+    for p in raw:
+        q = dict(p)
+        for k in ("headline", "hand_line", "caption"):
+            q[k] = q[k].replace("{count}", f"{n:,}").replace("{next}", f"{n + 1:,}")
+        out.append(q)
+    return out
 
 
 def _get_order(code):
@@ -50,7 +67,12 @@ def _get_order(code):
 
 @bp.get("/")
 def index():
-    return render_template("index.html", fuel=_fuel())
+    batches_dir = Path(current_app.static_folder) / "batches"
+    batch_shots = sorted(batches_dir.glob("*.jpg")) if batches_dir.exists() else []
+    return render_template(
+        "index.html", fuel=_fuel(), posters=_posters(),
+        batch_shots=batch_shots, now=ist_now(),
+    )
 
 
 def _render_write(templates, picked, values, errors, status_code=200):

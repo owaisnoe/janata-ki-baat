@@ -69,15 +69,32 @@ main { min-height: 55vh; }
 section.band { border-top: 1px solid var(--hair); padding: 54px 0; }
 .band h3 { font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(26px, 3.6vw, 34px); margin: 6px 0 28px; }
 
-/* --- hero --- */
-.hero { text-align: left; padding-top: 64px; }
-.hero h1 { font-size: clamp(40px, 6.4vw, 78px); line-height: 1.04; margin: 0 0 22px; text-transform: uppercase; }
-.hero h1 .flip { color: var(--verm-deep); }
+/* --- hero (v5) --- */
+.hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 44px; align-items: center; padding: 50px 0 38px; }
+.hero h2 { font-family: 'Playfair Display', serif; font-weight: 600; font-size: clamp(32px, 5.4vw, 58px);
+  line-height: 1.12; margin: 0 0 22px; }
+.hero h2 .quiet { color: var(--ink-soft); font-style: italic; }
+.hero h2 .loud { font-weight: 900; position: relative; }
+.hero h2 .loud svg { position: absolute; left: 0; bottom: -10px; width: 100%; height: 14px; }
+.hero p.sub { font-size: clamp(16px, 2vw, 18px); font-weight: 500; line-height: 1.65; color: var(--ink-soft);
+  max-width: 480px; margin: 0 0 30px; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 12px; }
+.stats { display: flex; flex-wrap: wrap; gap: 20px 36px; margin-top: 34px; }
+.stats > div { font-family:'IBM Plex Mono',monospace; font-size: 12px; font-weight: 500; color: var(--ink-soft); }
+.stats b { display: block; font-family: 'Playfair Display', serif; font-size: 26px; color: var(--ink); margin-bottom: 2px; }
+.stats .verm b { color: var(--verm-deep); }
+
+.env-scene { display: flex; justify-content: center; min-width: 0; }
+.env { background: var(--card); border: 1px solid var(--hair); border-radius: 3px; width: min(400px, 100%);
+  padding: 24px 26px 20px; position: relative;
+  box-shadow: 0 18px 50px rgba(23,21,18,.15), 0 2px 6px rgba(23,21,18,.06); transform: rotate(-2.5deg); }
+.env .to { font-size: clamp(20px, 2.6vw, 24px); line-height: 1.35; }
+.env .stampbox { position: absolute; top: 16px; right: 20px; }
+.env .postmark { position: absolute; top: 6px; right: 100px; opacity: .9; }
+
+/* .hero-sub / .hero-ctas kept — still used by diy.html and write.html */
 .hero-sub { font-size: clamp(18px, 2.4vw, 22px); max-width: 720px; margin-bottom: 30px; }
 .hero-ctas { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-bottom: 26px; }
-.hero-stats { display: flex; flex-wrap: wrap; gap: 12px 34px; font-family: 'IBM Plex Mono', monospace; font-size: 14px; }
-.hero-stats b { color: var(--verm-deep); font-size: 20px; }
-.cantmarch { font-family: 'Playfair Display', serif; font-size: 26px; text-transform: uppercase; color: var(--ink-soft); margin-top: 22px; }
 
 /* --- buttons --- */
 .btn { display: inline-block; background: var(--ink); color: var(--paper); text-decoration: none;
@@ -90,12 +107,25 @@ section.band { border-top: 1px solid var(--hair); padding: 54px 0; }
 .btn-small { font-size: 15px; padding: 9px 18px; }
 button.btn { font-family: inherit; }
 
-/* --- fuel strip --- */
-.fuel { background: var(--ink); color: var(--paper); }
-.fuel-inner { max-width: 1060px; margin: 0 auto; padding: 14px 20px; display: flex; flex-wrap: wrap; gap: 8px 28px; align-items: baseline; }
-.fuel-label { font-family: 'IBM Plex Mono', monospace; color: var(--paper-deep); font-size: 12px; letter-spacing: .16em; }
-.fuel a { color: var(--paper); font-size: 14px; text-decoration-color: var(--verm-deep); }
-.fuel .fuel-date { font-family: 'IBM Plex Mono', monospace; color: var(--verm-deep); font-size: 12px; margin-right: 6px; }
+/* --- fuel strip (dark live news desk, v5) --- */
+.fuel { background: var(--ink); color: var(--paper); padding: 0; border-block: 3px solid var(--verm-deep); }
+.fuel .deskhead { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: center;
+  padding: 12px 0 10px; border-bottom: 1px solid rgba(247,243,236,.14); }
+.fuel .lbl { font-family:'IBM Plex Mono',monospace; font-size: 11.5px; font-weight: 600; letter-spacing: .22em; color: var(--verm); }
+.live { display: inline-flex; align-items: center; gap: 7px; font-family:'IBM Plex Mono',monospace;
+  font-size: 10.5px; font-weight: 600; letter-spacing: .2em; color: var(--paper);
+  border: 1px solid rgba(247,243,236,.35); border-radius: 2px; padding: 3px 9px; }
+.live .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--verm); animation: pulse 1.6s ease infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.75); } }
+.fuel .upd { font-family:'IBM Plex Mono',monospace; font-size: 10.5px; letter-spacing: .12em; color: #9C948A; margin-left: auto; }
+.newswire { overflow: hidden; padding: 12px 0 13px; }
+.newswire .track { display: inline-flex; white-space: nowrap; animation: tick 48s linear infinite; }
+.newswire:hover .track { animation-play-state: paused; }
+.newswire .item { margin-right: 4em; font-size: 14.5px; font-weight: 500; }
+.newswire .d { font-family:'IBM Plex Mono',monospace; color: var(--verm); font-size: 11.5px; margin-right: 8px; letter-spacing: .08em; }
+.newswire a { color: var(--paper); text-decoration: none; border-bottom: 1px solid rgba(247,243,236,.35); padding-bottom: 1px; }
+.newswire a:hover { border-color: var(--verm); }
+.newswire .src { font-family:'IBM Plex Mono',monospace; font-size: 10.5px; color: #9C948A; margin-left: 8px; letter-spacing: .1em; }
 
 /* --- manifesto (zine block) --- */
 .manifesto {
@@ -106,6 +136,18 @@ button.btn { font-family: inherit; }
 .manifesto p { font-size: 18px; margin: 0 0 12px; }
 .manifesto .mono { font-size: 15px; }
 
+/* --- manifesto plate (v5 home page) --- */
+.plate-band { padding: 42px 0 50px; }
+.plate { background: var(--paper-deep); border: 1px solid var(--hair); border-radius: 3px;
+  box-shadow: inset 0 0 0 6px var(--paper-deep), inset 0 0 0 7px var(--hair);
+  padding: clamp(26px, 5vw, 48px); max-width: 780px; margin: 0 auto; }
+.plate .k { text-align: center; margin-bottom: 20px; }
+.plate p { font-family: 'Playfair Display', serif; font-size: clamp(19px, 2.6vw, 24px); line-height: 1.55;
+  margin: 0 0 14px; color: var(--ink); text-align: center; }
+.plate p b { font-weight: 900; }
+.plate .mono-line { text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600;
+  color: var(--verm-deep); letter-spacing: .06em; }
+
 /* --- steps --- */
 .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px; }
 .step { border: 2px solid var(--ink); background: var(--paper); padding: 20px; }
@@ -113,25 +155,64 @@ button.btn { font-family: inherit; }
 .step h3 { margin: 8px 0 6px; font-size: 22px; text-transform: uppercase; }
 .step p { margin: 0; font-size: 15px; }
 
-/* --- tier cards (perforated stamp borders) --- */
-.tiers { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 22px; }
-.tier {
-  background: var(--paper); border: 3px dashed var(--ink-soft);
-  outline: 3px solid var(--paper); outline-offset: -9px;
-  box-shadow: 6px 6px 0 rgba(25,17,17,.22);
-  padding: 26px 22px; position: relative; display: flex; flex-direction: column;
+/* --- steps (v5 home page) — scoped to section.band so diy.html's plain
+   .steps/.step (STEP/.num/h3 markup) keeps its own look above, untouched --- */
+section.band .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 30px; }
+section.band .step { border: none; border-left: 2px solid var(--hair); background: none; padding: 0 0 0 18px; }
+section.band .step .n { font-family:'IBM Plex Mono',monospace; font-size: 11px; font-weight: 600; letter-spacing: .22em;
+  color: var(--verm-deep); margin: 12px 0 6px; }
+section.band .step h4 { font-family:'Playfair Display',serif; font-size: 21px; margin: 0 0 8px; font-weight: 800; }
+section.band .step p { font-size: 15px; font-weight: 500; line-height: 1.6; color: var(--ink-soft); margin: 0; }
+
+/* --- tiers (v5 home page) — .tiers/.tier used only here, safe to replace --- */
+.tiers { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+.tier { background: var(--card); border: 1px solid var(--hair); border-radius: 3px; padding: 24px 22px;
+  position: relative; display: flex; flex-direction: column; transition: transform .18s, box-shadow .18s; }
+.tier:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(23,21,18,.12); }
+.tier.hero-tier { border: 1.5px solid var(--verm-deep); }
+.tier .tag { position: absolute; top: -11px; left: 18px; background: var(--verm-deep); color: var(--paper);
+  font-family:'IBM Plex Mono',monospace; font-size: 10px; font-weight: 600; letter-spacing: .14em; padding: 3px 10px; border-radius: 2px; }
+.tier .tag.inkbg { background: var(--ink); }
+.tier h4 { font-family:'Playfair Display',serif; font-weight: 800; font-size: 22px; margin: 6px 0 0; }
+.tier .price { font-family:'Playfair Display',serif; font-weight: 900; font-size: 42px; color: var(--verm-deep); }
+.tier .brk { font-family:'IBM Plex Mono',monospace; font-size: 11.5px; color: var(--stone); margin: 6px 0 10px; }
+.tier p { font-size: 14.5px; font-weight: 500; line-height: 1.6; color: var(--ink-soft); margin: 0 0 16px; flex: 1; }
+
+/* --- mailbag / proof wall (dark band, v5) --- */
+.mailbag { background: var(--ink); color: var(--paper); padding: 56px 0; }
+.mailbag h3 { color: var(--paper); }
+.mailbag .k { color: var(--verm); }
+.shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px; }
+.shot { border-radius: 4px; overflow: hidden; position: relative; min-height: 150px;
+  background: linear-gradient(125deg, #241f1a, #4a4238 60%, var(--stone)); }
+.shot .tint { position: absolute; inset: 0; background: linear-gradient(125deg, rgba(226,64,27,.28), transparent 65%); }
+.shot .envmini { position: absolute; left: 16px; top: 26px; width: 130px; height: 80px; background: var(--paper);
+  border-radius: 2px; transform: rotate(-4deg); padding: 8px; box-shadow: 0 8px 20px rgba(0,0,0,.5); }
+.shot .cap { position: absolute; right: 12px; bottom: 10px; font-family:'IBM Plex Mono',monospace; font-size: 10.5px;
+  font-weight: 600; letter-spacing: .12em; color: var(--paper); }
+.mailbag .note { margin-top: 18px; font-size: 14.5px; color: #CFC8BC; font-weight: 500; }
+
+/* --- posters (v5) --- */
+.posters { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+.poster { background: var(--card); border: 1px solid var(--hair); border-radius: 3px; padding: 24px 20px; min-height: 140px;
+  position: relative; cursor: pointer; transition: transform .18s ease, box-shadow .18s ease; }
+.poster:hover { transform: translateY(-4px) rotate(-.4deg); box-shadow: 0 14px 34px rgba(23,21,18,.16); }
+.poster .share-tag { position: absolute; top: 10px; right: 12px; font-family:'IBM Plex Mono',monospace; font-size: 10px;
+  font-weight: 600; letter-spacing: .14em; color: var(--verm-deep); }
+.poster.dark { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.poster h5 { font-family:'Playfair Display',serif; font-size: 21px; font-weight: 800; line-height: 1.25; margin: 0; }
+
+/* --- sponsor band (v5) --- */
+.sponsor { display: flex; flex-wrap: wrap; align-items: center; gap: 30px 40px; }
+.sponsor .txt { flex: 1; min-width: 260px; }
+.sponsor p { max-width: 560px; font-size: 15.5px; font-weight: 500; line-height: 1.65; color: var(--ink-soft); margin: 0 0 18px; }
+
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; gap: 36px; padding: 40px 0 44px; }
+  .env-scene { order: 2; }
+  .env { transform: rotate(-1.5deg); }
+  section.band, .plate-band, .mailbag { padding: 42px 0; }
 }
-.tier-hero { background: var(--paper-deep); border-color: var(--verm-deep); }
-.tier .tag {
-  position: absolute; top: -14px; left: 18px; background: var(--verm-deep);
-  color: var(--paper); font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .12em;
-  padding: 3px 10px; border: 2px solid var(--ink);
-}
-.tier h3 { font-size: 26px; margin: 4px 0 2px; text-transform: uppercase; }
-.tier .price { font-family: 'Playfair Display', serif; font-size: 44px; color: var(--ink-soft); }
-.tier .breakdown { font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: var(--ink-soft); margin: 8px 0 12px; }
-.tier .promise { font-size: 15px; flex: 1; }
-.tier .btn { margin-top: 16px; text-align: center; }
 
 /* --- FAQ --- */
 .faq details { border: 2px solid var(--ink); background: var(--paper); margin-bottom: 10px; }

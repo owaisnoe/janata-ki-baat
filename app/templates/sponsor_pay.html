@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Pay — {{ s.public_code }}{% endblock %}
+{% block content %}
+
+<section class="section">
+  <div class="kicker">SPONSOR A LETTER — PAY THE FUND</div>
+  <h1 style="margin-top:0"><span class="pay-amount">₹{{ s.amount }}</span> into the Letters Fund</h1>
+  <p class="small">Sponsorship <span class="slip">{{ s.public_code }}</span> ·
+    {{ s.bundle_qty }} letter{{ 's' if s.bundle_qty != 1 else '' }} · unpaid sponsorships expire in 24 hours.</p>
+
+  <div class="pay-box" style="margin-top:26px">
+    <div>
+      <div class="qr-frame stamp-frame">
+        <img src="{{ url_for('public.sponsor_qr', code=s.public_code) }}"
+             alt="UPI QR code for ₹{{ s.amount }}">
+      </div>
+      <p class="small mono center" style="margin-top:10px">SCAN WITH ANY UPI APP</p>
+      <a class="btn btn-small" href="{{ upi_uri }}" id="upi-intent">Open UPI app →</a>
+    </div>
+
+    <div>
+      <ol class="pay-steps">
+        <li>Scan the QR (or tap the button on your phone). Amount:
+          <strong>₹{{ s.amount }}</strong> exactly.</li>
+        <li>Keep <span class="slip">{{ s.public_code }}</span> in the
+          payment note — it's how we match you.</li>
+        <li>After paying, your UPI app shows a 12-digit
+          <strong>UTR / reference number</strong>. Paste it below.</li>
+      </ol>
+
+      <form method="post" class="form-grid"
+            action="{{ url_for('public.sponsor_utr', code=s.public_code) }}">
+        <div class="field">
+          <label for="f-utr">UTR / UPI reference number</label>
+          <input type="text" id="f-utr" name="utr" required minlength="6"
+                 maxlength="22" placeholder="e.g. 555023998877"
+                 value="{{ s.utr or '' }}">
+          <div class="hint">In GPay/PhonePe/Paytm: open the payment →
+            "UPI transaction ID" / "UTR".</div>
+        </div>
+        <button class="btn" type="submit">I've paid — verify me →</button>
+      </form>
+      <p class="small">We match it by hand against our UPI app and confirm
+        within a few hours. You'll get a receipt email. Questions?
+        Write to {{ cfg.OPERATOR_CONTACT }}.</p>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

@@ -327,3 +327,69 @@ def content_policy():
 @bp.get("/refunds")
 def refunds():
     return render_template("pages/refunds.html")
+
+
+@bp.get("/sponsor")
+def sponsor():
+    from ..models import Sponsorship
+    from ..services.util import fund_balance
+    sponsored = Sponsorship.query.filter_by(status="confirmed").with_entities(
+        db.func.sum(Sponsorship.bundle_qty)).scalar() or 0
+    return render_template("sponsor.html", bundles=current_app.config["SPONSOR_BUNDLES"],
+                           fund=fund_balance(), sponsored=sponsored)
+
+
+@bp.post("/sponsor")
+@limiter.limit("8 per hour")
+def sponsor_create():
+    from ..models import Sponsorship
+    email = (request.form.get("email") or "").strip()[:254]
+    if not EMAIL_RE.match(email):
+        flash("A working email, please — that's where your receipt goes.", "error")
+        return redirect(url_for("public.sponsor"))
+    bundles = dict(current_app.config["SPONSOR_BUNDLES"])
+    try:
+        qty = int(request.form.get("bundle", "1"))
+    except ValueError:
+        qty = 1
+    if qty not in bundles:
+        qty = 1
+    s = Sponsorship(public_code=gen_public_code("JKS-", Sponsorship),
+                    email=email, bundle_qty=qty, amount=bundles[qty])
+    db.session.add(s)
+    db.session.commit()
+    return redirect(url_for("public.sponsor_pay", code=s.public_code))
+
+
+def _get_sponsorship(code):
+    from ..models import Sponsorship
+    s = Sponsorship.query.filter_by(public_code=code.upper()).first()
+    if s is None:
+        abort(404)
+    return s
+
+
+@bp.get("/sponsor/pay/<code>")
+def sponsor_pay(code):
+    s = _get_sponsorship(code)
+    return render_template("sponsor_pay.html", s=s, upi_uri=payments.upi_uri(s))
+
+
+@bp.get("/sponsor/pay/<code>/qr.png")
+def sponsor_qr(code):
+    return send_file(payments.qr_png(_get_sponsorship(code)), mimetype="image/png")
+
+
+@bp.post("/sponsor/pay/<code>/utr")
+@limiter.limit("20 per hour")
+def sponsor_utr(code):
+    from ..models import utcnow
+    s = _get_sponsorship(code)
+    utr = (request.form.get("utr") or "").strip().replace(" ", "")
+    if not UTR_RE.match(utr):
+        flash("That doesn't look like a UPI reference number (UTR).", "error")
+        return redirect(url_for("public.sponsor_pay", code=s.public_code))
+    s.utr, s.status, s.utr_at = utr, "utr_submitted", utcnow()
+    db.session.commit()
+    flash("Got it — we'll match your payment and email your receipt.", "success")
+    return redirect(url_for("public.sponsor"))

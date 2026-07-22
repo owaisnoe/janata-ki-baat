@@ -68,6 +68,8 @@ class Config:
     }
     TIP_MAX = 500
 
+    SPONSOR_BUNDLES = [(1, 59), (3, 177), (5, 295), (10, 590)]
+
     # SLA (plan §9)
     SLA_POST_DAYS = 2
     SLA_REFUND_DAYS = 5

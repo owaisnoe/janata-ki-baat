@@ -164,8 +164,9 @@
       <div class="txt">
         <div class="kicker">THE LETTERS FUND</div>
         <h3 style="margin-bottom:10px;">Post someone else's anger.</h3>
-        <p>Not everyone who wants on the record can spare ₹59 — hostel months are long. Sponsor one letter or five; every rupee sits in the public Letters Fund, every sponsored letter lands on the ledger. <b style="color:var(--ink);">0 sponsored so far.</b></p>
-        <a class="btn" style="margin:0" href="{{ url_for('public.index') }}#sponsor">Sponsor letters →</a>
+        {% set sponsored_count = sponsored_letters_count() %}
+        <p>Not everyone who wants on the record can spare ₹59 — hostel months are long. Sponsor one letter or five; every rupee sits in the public Letters Fund, every sponsored letter lands on the ledger. <b style="color:var(--ink);">{{ sponsored_count }} sponsored so far.</b></p>
+        <a class="btn" style="margin:0" href="{{ url_for('public.sponsor') }}">Sponsor letters →</a>
       </div>
     </div>
   </section>

@@ -33,11 +33,12 @@ def create_app(config_class=Config):
 
     @app.context_processor
     def inject_globals():
-        from .services.util import letters_count, slots_left
+        from .services.util import letters_count, slots_left, sponsored_letters_count
 
         return {
             "letters_count": letters_count,
             "slots_left": slots_left,
+            "sponsored_letters_count": sponsored_letters_count,
             "TIERS": app.config["TIERS"],
             "cfg": app.config,
         }

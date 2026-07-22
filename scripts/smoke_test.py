@@ -233,6 +233,26 @@ def main():
     check("waitlist capture", r.status_code == 302)
     app.config["DAILY_CAP"] = 0
 
+    # --- sponsor flow ---
+    r = client.get("/sponsor")
+    check("sponsor page", r.status_code == 200 and b"Letters Fund" in r.data)
+    r = client.post("/sponsor", data={"email": "daani@example.com", "bundle": "3"})
+    check("sponsorship created", r.status_code == 302 and "/sponsor/pay/JKS-" in r.headers["Location"])
+    scode = r.headers["Location"].rstrip("/").split("/")[-1]
+    r = client.get(f"/sponsor/pay/{scode}")
+    check("sponsor pay page", r.status_code == 200 and b"177" in r.data)
+    r = client.post(f"/sponsor/pay/{scode}/utr", data={"utr": "555023998877"})
+    check("sponsor UTR", r.status_code == 302)
+    with app.app_context():
+        from app.models import Sponsorship
+        s = Sponsorship.query.filter_by(public_code=scode).first()
+        sid = s.id
+    r = client.post(f"/admin/sponsor/{sid}/confirm")
+    check("sponsor confirmed", r.status_code == 302)
+    with app.app_context():
+        check("fund entry on ledger", LedgerEntry.query.filter_by(
+            type="fund", order_ref=scode).count() == 1)
+
     print(f"\nALL {PASS} CHECKS PASSED")
 
 

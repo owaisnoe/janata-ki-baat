@@ -21,11 +21,20 @@ def ist_today():
     return ist_now().date()
 
 
-def gen_public_code():
+def gen_public_code(prefix="JKB-", model=None):
+    from ..models import Order
+    model = model or Order
     while True:
-        code = "JKB-" + "".join(secrets.choice(CODE_ALPHABET) for _ in range(7))
-        if not Order.query.filter_by(public_code=code).first():
+        code = prefix + "".join(secrets.choice(CODE_ALPHABET) for _ in range(7))
+        if not model.query.filter_by(public_code=code).first():
             return code
+
+
+def fund_balance():
+    from ..models import LedgerEntry
+    total = db.session.query(db.func.sum(LedgerEntry.amount)).filter(
+        LedgerEntry.type.in_(["fund", "tip"])).scalar()
+    return float(total or 0)
 
 
 def _cap_row(for_date=None):
@@ -90,6 +99,15 @@ def letters_count():
     return db.session.query(db.func.count(Order.id)).filter(
         Order.serial_no.isnot(None)
     ).scalar() or 0
+
+
+def sponsored_letters_count():
+    """Total bundle_qty across confirmed sponsorships."""
+    from ..models import Sponsorship
+    total = db.session.query(db.func.sum(Sponsorship.bundle_qty)).filter(
+        Sponsorship.status == "confirmed"
+    ).scalar()
+    return int(total or 0)
 
 
 def next_serial():

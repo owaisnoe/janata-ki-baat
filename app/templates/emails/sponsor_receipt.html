@@ -1,0 +1,12 @@
+{% from "emails/_base.html" import email_shell %}
+{% call email_shell("Receipt — you sponsored " ~ s.bundle_qty ~ " letter(s) via the Letters Fund.") %}
+  <p>Thank you for sponsoring {{ s.bundle_qty }} letter{{ 's' if s.bundle_qty != 1 else '' }}.</p>
+  <p>Your payment of <strong style="color:#C1121F;">₹{{ s.amount }}</strong>
+  has been confirmed and added to the public Letters Fund under
+  <strong>{{ s.public_code }}</strong>.</p>
+  <p>Every rupee sits in the fund until someone who can't pay claims a free
+  letter — then it covers their stamp, exactly like a paid letter. The full
+  fund balance is visible on the <a href="https://janatakibaat.in/ledger">public ledger</a>.</p>
+  <p>— Janata Ki Baat<br>
+  <span style="font-size:13px;">Distance is not silence.</span></p>
+{% endcall %}

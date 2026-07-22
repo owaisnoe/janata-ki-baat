@@ -11,7 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from app import create_app  # noqa: E402
 from app.extensions import db  # noqa: E402
-from app.models import Order, utcnow  # noqa: E402
+from app.models import Order, Sponsorship, utcnow  # noqa: E402
 from app.services.util import release_slot  # noqa: E402
 
 
@@ -27,6 +27,14 @@ def main():
             release_slot(order)
         db.session.commit()
         print(f"expired {len(stale)} unpaid orders")
+
+        stale_s = Sponsorship.query.filter(
+            Sponsorship.status == "pending_payment", Sponsorship.created_at < cutoff
+        ).all()
+        for s in stale_s:
+            s.status = "expired"
+        db.session.commit()
+        print(f"expired {len(stale_s)} unpaid sponsorships")
 
 
 if __name__ == "__main__":

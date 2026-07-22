@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% import "_art.html" as art %}
+{% block title %}Sponsor a Letter — Letters Fund{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="kicker">THE LETTERS FUND — SPONSOR A LETTER</div>
+  <div class="sponsor" style="margin-bottom:32px;">
+    {{ art.seal("₹59", "SPONSOR A LETTER") }}
+    <div class="txt">
+      <h1 style="margin-top:0">Post someone else's anger.</h1>
+      <p>Not everyone who wants on the record can spare ₹59 — hostel months are long. Sponsor one letter or five; every rupee sits in the public Letters Fund, every sponsored letter lands on the ledger.</p>
+      <p class="mono" style="font-size:13px;">₹{{ "%.2f"|format(fund) }} in the fund · {{ sponsored }} letter{{ 's' if sponsored != 1 else '' }} sponsored so far.</p>
+    </div>
+  </div>
+
+  <form method="post" action="{{ url_for('public.sponsor_create') }}" class="form-grid" style="max-width:560px">
+    <div class="field">
+      <label>Your email — receipt goes here</label>
+      <input type="email" name="email" required maxlength="254" placeholder="you@example.com">
+    </div>
+    <div class="field">
+      <label>Choose a bundle</label>
+      <div class="tiers" style="margin-top:8px;">
+        {% for qty, price in bundles %}
+        <label class="tier" style="cursor:pointer;position:relative;">
+          <input type="radio" name="bundle" value="{{ qty }}"
+                 {% if qty == 1 %}checked{% endif %}
+                 style="position:absolute;opacity:0;width:0;height:0;">
+          <h4>{{ qty }} letter{{ 's' if qty != 1 else '' }}</h4>
+          <div class="price">₹{{ price }}</div>
+          <div class="brk">₹{{ price // qty }} per letter</div>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+    <button class="btn verm" type="submit">Sponsor letters →</button>
+  </form>
+
+  <div class="faq" style="max-width:560px;margin-top:36px;">
+    <details>
+      <summary>Where does the money go?</summary>
+      <div class="answer">Every rupee you pay sits in the public Letters Fund — visible on the <a href="{{ url_for('public.ledger') }}">public ledger</a>. When someone who can't pay claims a free letter, the fund covers their stamp. Nothing is hidden.</div>
+    </details>
+    <details>
+      <summary>How do free letters get claimed?</summary>
+      <div class="answer">On the Write a Letter page, people who can't pay can request a sponsored letter. The fund covers the cost; the letter goes in the mailbag exactly like a paid one.</div>
+    </details>
+  </div>
+</section>
+{% endblock %}

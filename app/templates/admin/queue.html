@@ -16,7 +16,8 @@
   <div class="admin-tabs">
     {% for name, label in [('confirm', 'Confirm UTR'), ('print', 'To print'),
                            ('post', 'To post'), ('posted', 'Posted'),
-                           ('pending', 'Awaiting payment'), ('done', 'Closed')] %}
+                           ('pending', 'Awaiting payment'), ('done', 'Closed'),
+                           ('sponsor', 'Sponsor UTR')] %}
     <a href="{{ url_for('admin.queue', tab=name) }}"
        class="{% if tab == name %}active{% endif %}">{{ label }}
        <span class="badge">{{ counts[name] }}</span></a>
@@ -31,7 +32,33 @@
   </form>
   {% endif %}
 
-  {% if orders %}
+  {% if tab == 'sponsor' %}
+    {% if sponsorships %}
+    <table class="admin-table">
+      <thead><tr>
+        <th>Code</th><th>Email</th><th>Qty</th><th>₹</th><th>UTR</th><th></th>
+      </tr></thead>
+      <tbody>
+        {% for s in sponsorships %}
+        <tr>
+          <td class="mono">{{ s.public_code }}</td>
+          <td>{{ s.email }}</td>
+          <td class="mono">{{ s.bundle_qty }}</td>
+          <td class="mono">{{ s.amount }}</td>
+          <td class="mono">{{ s.utr or '—' }}</td>
+          <td class="admin-actions">
+            <form method="post" action="{{ url_for('admin.sponsor_confirm', s_id=s.id) }}">
+              <button class="btn btn-small" type="submit">Confirm ✓</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="mono">Nothing in this queue. Good.</p>
+    {% endif %}
+  {% elif orders %}
   <table class="admin-table">
     <thead><tr>
       <th>Code</th><th>#</th><th>Name / city</th><th>Tier</th><th>₹</th>

@@ -18,7 +18,7 @@ from flask import (
 )
 
 from ..extensions import db, limiter
-from ..models import LedgerEntry, Order, WaitlistEntry, utcnow
+from ..models import LedgerEntry, Order, Sponsorship, WaitlistEntry, utcnow
 from ..services import mailer, pdf
 from ..services.util import next_serial, release_slot
 
@@ -75,10 +75,17 @@ def queue():
         "done": Order.query.filter(Order.status.in_(["delivered", "expired",
                                                      "refunded"]))
         .order_by(Order.created_at.desc()),
+        "sponsor": Sponsorship.query.filter_by(status="utr_submitted")
+        .order_by(Sponsorship.utr_at),
     }
     if tab not in tab_queries:
         tab = "confirm"
-    orders = tab_queries[tab].limit(200).all()
+    sponsorships = None
+    if tab == "sponsor":
+        sponsorships = tab_queries["sponsor"].limit(200).all()
+        orders = []
+    else:
+        orders = tab_queries[tab].limit(200).all()
     counts = {name: q.count() for name, q in tab_queries.items()}
     flagged_count = Order.query.filter_by(flagged=True).filter(
         Order.status.in_(["utr_submitted", "confirmed"])
@@ -87,6 +94,7 @@ def queue():
     return render_template(
         "admin/queue.html", orders=orders, tab=tab, counts=counts,
         flagged_count=flagged_count, waitlist_count=waitlist_count,
+        sponsorships=sponsorships,
     )
 
 
@@ -135,6 +143,26 @@ def confirm(order_id):
     flash(f"{order.public_code} confirmed as Letter #{order.serial_no}.",
           "success")
     return redirect(url_for("admin.queue"))
+
+
+@bp.post("/sponsor/<int:s_id>/confirm")
+@admin_required
+def sponsor_confirm(s_id):
+    s = db.session.get(Sponsorship, s_id)
+    if s is None or s.status != "utr_submitted":
+        flash("Sponsorship not awaiting confirmation.", "error")
+        return redirect(url_for("admin.queue", tab="sponsor"))
+    s.status, s.confirmed_at = "confirmed", utcnow()
+    db.session.add(LedgerEntry(type="fund", amount=s.amount,
+                               order_ref=s.public_code,
+                               note=f"sponsored {s.bundle_qty} letter(s)"))
+    db.session.commit()
+    mailer.send_email(
+        s.email, f"Receipt — you sponsored {s.bundle_qty} letter(s)",
+        render_template("emails/sponsor_receipt.html", s=s),
+    )
+    flash(f"{s.public_code} confirmed — ₹{s.amount} into the Letters Fund.", "success")
+    return redirect(url_for("admin.queue", tab="sponsor"))
 
 
 @bp.post("/order/<int:order_id>/expire")

@@ -114,3 +114,22 @@ class WaitlistEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(254), unique=True, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=utcnow)
+
+
+class Sponsorship(db.Model):
+    __tablename__ = "sponsorships"
+
+    id = db.Column(db.Integer, primary_key=True)
+    public_code = db.Column(db.String(20), unique=True, nullable=False, index=True)
+    email = db.Column(db.String(254), nullable=False)
+    bundle_qty = db.Column(db.Integer, nullable=False)
+    amount = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.String(20), nullable=False, default="pending_payment")
+    utr = db.Column(db.String(40), nullable=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=utcnow)
+    utr_at = db.Column(db.DateTime, nullable=True)
+    confirmed_at = db.Column(db.DateTime, nullable=True)
+
+    @property
+    def total(self):
+        return self.amount

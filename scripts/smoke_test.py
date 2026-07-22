@@ -52,6 +52,17 @@ def main():
     r = client.get("/diy/kit.pdf")
     check("DIY kit PDF", r.status_code == 200 and r.data[:4] == b"%PDF")
 
+    # --- Task 1: Ink & Letterpress chrome ---
+    r = client.get("/")
+    check("masthead students line", b"FROM THE STUDENTS" in r.data)
+    check("no Anton font", b"Anton" not in r.data)
+    check("Playfair + Caveat loaded", b"Playfair+Display" in r.data
+          and b"Caveat" in r.data)
+    css = (ROOT / "app" / "static" / "css" / "style.css").read_text(encoding="utf-8")
+    for hexcode in ["3D0808", "6E1010", "C1121F", "A50F1B"]:
+        check(f"no maroon {hexcode} in css", hexcode not in css)
+    check("tokens present", "--verm-deep" in css and "#F7F3EC" in css)
+
     # --- write flow ---
     form = {
         "template": "neet-accountability",

@@ -618,7 +618,7 @@ Remove the old `#f-tip`-range slider JS block.
   letter-spacing: .06em; display: inline-block; }
 ```
 
-Replace old `.pay-code` usages in `pay.html`/`status.html` with `.slip` (keep a `.pay-code { }` alias or update both templates).
+Update all three existing `class="pay-code"` usages to `class="slip"`: two in `pay.html` (the order-code line and the "Keep {code} in the payment note" line) and one in `status.html` (the tracking-number span, at the `India Post tracking:` line — Task 7 rewrites the rest of that file, but this specific span is in scope here since it's a straight class rename, not a journey-timeline concern). Delete the old `.pay-code` CSS rule; there is no alias.
 
 - [ ] **Step 4: Run — expect PASS.**
 - [ ] **Step 5: Commit** — `git add -A && git commit -m "redesign: pay page stamp-frame QR, booking slip, mid-flow share moment"`
@@ -996,7 +996,7 @@ Delete `instance/jkb.db` (new column).
 - Modify: `app/services/sharecard.py`, `app/routes/public.py`, `app/static/js/main.js`, `scripts/smoke_test.py`
 
 **Interfaces:**
-- Produces: route `GET /posters/<poster_id>.png` (1080×1350 PNG, disk-cached in `CARD_CACHE_DIR`); `posters.render_poster(poster: dict) -> Path`; sharecard palette constants renamed `INK/PAPER/CARD/VERM/VERM_DEEP`; font resolution order: bundled TTFs first, then system fallbacks.
+- Produces: route `GET /posters/<poster_id>.png` (1080×1350 PNG, disk-cached in `CARD_CACHE_DIR`); `posters.render_poster(poster: dict) -> Path`; sharecard palette constants renamed to `BAND_BG/STAMP_RED/PAPER/AGED/INK`; font resolution order: bundled TTFs first, then system fallbacks.
 
 - [ ] **Step 1: Download fonts** (variable TTFs from the google/fonts repo, OFL-licensed):
 
@@ -1102,25 +1102,24 @@ def poster_png(poster_id):
     return send_file(poster_svc.render_poster(match[0]), mimetype="image/png")
 ```
 
-`sharecard.py` restyle — constant swap only, layout unchanged:
+`sharecard.py` restyle — palette rename + swap, layout unchanged. Share cards have no hand-lettering (that's poster-only, rendered separately above) — do not introduce Caveat here. Replace the constants block:
 
 ```python
-INK = "#171512"
+BAND_BG = "#171512"    # was MAROON — top/bottom band fill; rename every use site
+STAMP_RED = "#B93511"
 PAPER = "#F7F3EC"
 AGED = "#EFE7D8"
-STAMP_RED = "#B93511"
-MAROON = INK  # bands are now ink; name kept so band code reads unchanged
+INK = "#171512"
 ```
 
-and put the bundled fonts first in the candidate lists:
+Rename every `MAROON` reference in the file (the two `d.rectangle(..., fill=MAROON)` calls) to `BAND_BG`. Leave `DISPLAY_FONTS` and `MONO_FONTS` as font-role lists (display headline vs. mono labels/date) and only prepend the bundled display font:
 
 ```python
 _FONT_DIR = str(Path(__file__).resolve().parent.parent / "static" / "fonts")
 DISPLAY_FONTS = [_FONT_DIR + "/PlayfairDisplay.ttf", *DISPLAY_FONTS]
-MONO_FONTS = [_FONT_DIR + "/Caveat.ttf", *MONO_FONTS]  # hand lines, not mono — rename var to ACCENT_FONTS if editing further
 ```
 
-(Cleaner: rename the second list usage where the card draws the sub-lines; keep the diff minimal.)
+`MONO_FONTS` is unchanged (still system Consolas/Courier/DejaVu Mono fallbacks) — it renders the "VOL. 1" subline, the postmark date, and the footer tagline, all of which stay monospace-styled, matching the site's IBM Plex Mono usage elsewhere.
 
 `main.js` — poster tap-to-share (delegated, works on home/pay):
 

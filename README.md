@@ -20,6 +20,20 @@ cp .env.example .env        # then edit: SECRET_KEY, ADMIN_PASSWORD, UPI_VPA
 Dev conveniences: no SMTP configured → emails are written to
 `instance/outbox/*.html`; no Turnstile keys → the check is skipped.
 
+**Cap & pace env vars:**
+- `DAILY_CAP` — max letters accepted per day. `0` (default, the launch
+  decision) means **uncapped**; any positive integer re-enables the brake
+  and starts routing overflow to the waitlist once hit.
+- `BATCH_PACE` — letters the operator can realistically post per working
+  day (default `50`). Drives the honest "posts by …" date shown at write
+  time and on confirm (`promised_post_date()` — queue depth ÷ pace,
+  skipping Sundays).
+
+**Batch-photo drop folder:** drop envelope-batch JPEGs into
+`app/static/batches/*.jpg` (create the folder — it's gitignored) and
+they'll show up on the home page proof wall automatically, newest first.
+No DB entry or restart needed.
+
 ## The full loop (dogfood before launch — plan §12 H30–36)
 
 1. `/write` → pick letter, fill details, **Post my letter →**
@@ -64,6 +78,8 @@ Dev conveniences: no SMTP configured → emails are written to
 - [ ] Disclaimer visible on every page (base template footer — verify)
 - [ ] mail-tester ≥9 for all three emails
 - [ ] Mobile + contrast pass
+- [ ] Poster share test on a real Android phone (Web Share API + saved PNG)
+- [ ] Thunk animation + signature check on mobile Safari/Chrome
 - [ ] Cloudflare Web Analytics token in `.env`
 - [ ] DB + repo backed up
 - [ ] Razorpay individual KYC filed (swap-in is Phase 2)
@@ -77,11 +93,19 @@ app/
   models.py          orders / templates / ledger / daily_cap / waitlist
   letter_templates.py  the 3 formal letters (T1/T2/T3)
   moderation.py      keyword auto-flag for personal paragraphs
-  routes/public.py   landing, write, pay, status, ledger, diy, policies
+  routes/public.py   landing, write, pay, status, ledger, diy, policies,
+                     sponsor + sponsor pay
   routes/admin.py    ops queue: confirm → print run → post+proof → delivered
-  services/          pdf (reportlab), sharecard (Pillow), mailer (SMTP),
+  services/          pdf (reportlab), sharecard (Pillow), posters (Pillow —
+                     shareable letter-posted poster PNGs), mailer (SMTP),
                      payments (UPI QR/intent + Turnstile), util (codes/caps)
-  templates/ static/ zine-brutalist UI (plan §7 tokens)
+  templates/         _art.html (SVG art macros: stamp, postmark, letterhead
+                     doodles), sponsor.html / sponsor_pay.html,
+                     emails/sponsor_receipt.html
+  static/            fonts/ (bundled Playfair Display + Caveat, OFL — no
+                     external font requests), batches/ (operator-dropped
+                     proof-wall JPEGs, gitignored), zine-brutalist UI
+                     (plan §7 tokens)
 scripts/             cron: expiry, DPDP purge, SLA watchdog, backup
 passenger_wsgi.py    cPanel entry · run.py local entry
 ```

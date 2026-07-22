@@ -15,11 +15,11 @@
   <div class="ledger-totals" style="margin-top:26px">
     <div class="ledger-card">
       <div class="amt amt-in">₹{{ "%.2f" | format(totals.get('fee', 0) + totals.get('tip', 0)) }}</div>
-      <div class="lbl">In</div>
+      <div class="lbl">In — fees + tips</div>
     </div>
     <div class="ledger-card">
       <div class="amt amt-out">₹{{ "%.2f" | format((totals.get('postage', 0) + totals.get('print', 0) + totals.get('infra', 0) + totals.get('refund', 0)) | abs) }}</div>
-      <div class="lbl">Out</div>
+      <div class="lbl">Out — postage, print, infra, refunds</div>
     </div>
     <div class="ledger-card">
       <div class="amt">₹{{ "%.2f" | format(totals.get('tip', 0) + totals.get('fund', 0)) }}</div>

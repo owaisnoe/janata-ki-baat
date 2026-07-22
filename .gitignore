@@ -4,6 +4,7 @@ __pycache__/
 .env
 instance/
 app/static/cards/
+app/static/batches/
 uploads/
 *.db
 backups/

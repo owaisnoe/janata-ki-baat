@@ -75,9 +75,9 @@
         <td class="mono">{{ o.total }}</td>
         <td class="mono">{{ o.utr or '—' }}</td>
         <td class="mono">{{ o.status }}</td>
-        <td>{% if o.flagged %}<span style="color:var(--stamp-red-dark)">⚑</span>{% endif %}
+        <td>{% if o.flagged %}<span style="color:var(--verm-deep)">⚑</span>{% endif %}
             {% if o.personal_para %}¶{% endif %}
-            {% if o.sponsored_request %}<span class="mono" style="color:var(--stamp-red-dark)">FUND</span>{% endif %}</td>
+            {% if o.sponsored_request %}<span class="mono" style="color:var(--verm-deep)">FUND</span>{% endif %}</td>
         <td class="admin-actions">
           {% if o.status == 'utr_submitted' %}
           <form method="post" action="{{ url_for('admin.confirm', order_id=o.id) }}">

@@ -372,7 +372,7 @@ section.band .step p { font-size: 15px; font-weight: 500; line-height: 1.6; colo
 .ledger-card .lbl { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
 table.ledger-table, table.admin-table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
 .ledger-table th, .ledger-table td, .admin-table th, .admin-table td {
-  border: 1.5px solid var(--ink); padding: 8px 10px; text-align: left; vertical-align: top;
+  border: 1px solid var(--hair); padding: 8px 10px; text-align: left; vertical-align: top;
 }
 .ledger-table th, .admin-table th { background: var(--ink); color: var(--paper); font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
 .amt-in { color: #1c6b2a; font-weight: 600; }

@@ -385,6 +385,9 @@ def sponsor_qr(code):
 def sponsor_utr(code):
     from ..models import utcnow
     s = _get_sponsorship(code)
+    if s.status not in ("pending_payment", "utr_submitted"):
+        flash("This sponsorship has already been processed.", "info")
+        return redirect(url_for("public.sponsor"))
     utr = (request.form.get("utr") or "").strip().replace(" ", "")
     if not UTR_RE.match(utr):
         flash("That doesn't look like a UPI reference number (UTR).", "error")

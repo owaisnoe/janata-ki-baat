@@ -273,6 +273,15 @@ def main():
         check("fund debited for sponsored letter", LedgerEntry.query.filter_by(
             type="fund", order_ref=code_sp).filter(LedgerEntry.amount < 0).count() == 1)
 
+    # --- posters + restyled cards ---
+    r = client.get("/posters/cant-march.png")
+    check("poster png", r.status_code == 200 and r.data[:8] == b"\x89PNG\r\n\x1a\n")
+    r = client.get("/posters/nope.png")
+    check("unknown poster 404", r.status_code == 404)
+    src = (ROOT / "app" / "services" / "sharecard.py").read_text(encoding="utf-8")
+    for hexcode in ["3D0808", "C1121F"]:
+        check(f"no maroon {hexcode} in sharecard", hexcode not in src)
+
     print(f"\nALL {PASS} CHECKS PASSED")
 
 

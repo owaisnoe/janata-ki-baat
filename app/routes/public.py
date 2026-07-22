@@ -233,6 +233,15 @@ def pay_qr(code):
     return send_file(payments.qr_png(order), mimetype="image/png")
 
 
+@bp.get("/posters/<poster_id>.png")
+def poster_png(poster_id):
+    from ..services import posters as poster_svc
+    match = [p for p in _posters() if p["id"] == poster_id]
+    if not match:
+        abort(404)
+    return send_file(poster_svc.render_poster(match[0]), mimetype="image/png")
+
+
 @bp.post("/pay/<code>/utr")
 @limiter.limit("20 per hour")
 def pay_utr(code):

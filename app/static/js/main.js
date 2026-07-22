@@ -106,6 +106,26 @@
     });
   });
 
+  /* ---------- posters: tap to share ---------- */
+  document.querySelectorAll(".poster[data-poster-id]").forEach(function (card) {
+    card.addEventListener("click", function () {
+      var id = card.dataset.posterId, caption = card.dataset.caption || "";
+      var pngUrl = location.origin + "/posters/" + id + ".png";
+      if (navigator.canShare && window.fetch) {
+        fetch(pngUrl).then(function (r) { return r.blob(); }).then(function (blob) {
+          var file = new File([blob], id + ".png", { type: "image/png" });
+          if (navigator.canShare({ files: [file] })) {
+            return navigator.share({ files: [file], text: caption });
+          }
+          return navigator.share({ text: caption, url: "https://janatakibaat.in" });
+        }).catch(function () { /* user closed sheet */ });
+      } else {
+        navigator.clipboard && navigator.clipboard.writeText(caption);
+        window.open(pngUrl, "_blank");
+      }
+    });
+  });
+
   /* ---------- Web Share API (status page) ---------- */
   var shareBtn = document.getElementById("share-btn");
   if (shareBtn) {

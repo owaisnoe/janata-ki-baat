@@ -8,11 +8,11 @@ from PIL import Image, ImageDraw, ImageFont
 
 from .util import ist_now
 
-MAROON = "#3D0808"
-STAMP_RED = "#C1121F"
-PAPER = "#F4EDDE"
-AGED = "#E9DDC4"
-INK = "#191111"
+BAND_BG = "#171512"    # was MAROON — top/bottom band fill
+STAMP_RED = "#B93511"
+PAPER = "#F7F3EC"
+AGED = "#EFE7D8"
+INK = "#171512"
 
 # First hit wins — Windows dev box, then common shared-host Linux paths.
 DISPLAY_FONTS = [
@@ -27,6 +27,9 @@ MONO_FONTS = [
     "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
     "/usr/share/fonts/dejavu/DejaVuSansMono.ttf",
 ]
+
+_FONT_DIR = str(Path(__file__).resolve().parent.parent / "static" / "fonts")
+DISPLAY_FONTS = [_FONT_DIR + "/PlayfairDisplay.ttf", *DISPLAY_FONTS]
 
 
 def _font(candidates, size):
@@ -81,8 +84,8 @@ def render_card(order, fmt="square"):
     d = ImageDraw.Draw(img)
 
     band = 170 if fmt == "story" else 150
-    d.rectangle([0, 0, w, band], fill=MAROON)
-    d.rectangle([0, h - band + 20, w, h], fill=MAROON)
+    d.rectangle([0, 0, w, band], fill=BAND_BG)
+    d.rectangle([0, h - band + 20, w, h], fill=BAND_BG)
     _perforation(d, band, w, PAPER)
     _perforation(d, h - band + 20, w, PAPER)
 

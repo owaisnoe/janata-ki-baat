@@ -124,6 +124,17 @@
   <button class="btn btn-small" id="share-btn"
           data-url="{{ cfg.BASE_URL }}{{ url_for('public.status', code=order.public_code) }}"
           data-text="{{ captions[0] }}">Share →</button>
+
+  <hr class="rule" style="margin:34px 0">
+  <div class="sponsor-callout">
+    <div>
+      <b>You're on the record. Help someone who can't afford to be.</b>
+      <p>Hostel months are long. Sponsor a letter for someone who can't spare
+         the stamp — ₹{{ cfg.SPONSOR_UNIT_PRICE }} puts one more voice in the
+         mailbag, and every rupee shows on the public ledger.</p>
+    </div>
+    <a class="btn verm" href="{{ url_for('public.sponsor') }}">Sponsor a letter →</a>
+  </div>
   {% endif %}
   {% endif %}
 </section>

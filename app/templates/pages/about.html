@@ -21,9 +21,11 @@
   copycat scam sites, we know trust has to be earned in public, so we earn
   it with receipts rather than credentials: every rupee sits on the
   <a href="{{ url_for('public.ledger') }}">public ledger</a>, every envelope
-  is photographed at the post-office counter, and a real person answers this
-  address:</p>
+  is photographed at the post-office counter, and there's a named, reachable
+  person behind it — no anonymous shell:</p>
   <ul>
+    {% if cfg.OPERATOR_NAME %}<li><strong>Operator:</strong> {{ cfg.OPERATOR_NAME }}</li>{% endif %}
+    {% if cfg.OPERATOR_CITY %}<li><strong>Based in:</strong> {{ cfg.OPERATOR_CITY }}</li>{% endif %}
     <li><strong>Contact &amp; grievances:</strong> {{ cfg.OPERATOR_CONTACT }}</li>
   </ul>
   <p class="small">Grievances are acknowledged within 48 hours. If we ever

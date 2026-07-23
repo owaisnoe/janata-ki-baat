@@ -36,9 +36,12 @@ class Config:
 
     CF_ANALYTICS_TOKEN = os.environ.get("CF_ANALYTICS_TOKEN", "")
 
-    # Named operator identity was removed (student-collective framing on
-    # /about). Only a working grievance/contact address is exposed — required
-    # by the IT Rules and used across /about, /privacy, /refunds, footer, pay.
+    # Operator identity shown on /about. Name/city are optional (render only
+    # if set) but required for payment-gateway KYC (Razorpay etc.) — they must
+    # match the operator's official PAN/bank records. Contact address is always
+    # shown (IT Rules) and used across /about, /privacy, /refunds, footer, pay.
+    OPERATOR_NAME = os.environ.get("OPERATOR_NAME", "")
+    OPERATOR_CITY = os.environ.get("OPERATOR_CITY", "")
     OPERATOR_CONTACT = os.environ.get("OPERATOR_CONTACT", "letters@janatakibaat.in")
 
     # Proof photos live OUTSIDE the web root; served only via code-gated routes.

@@ -107,10 +107,14 @@
       </div>
 
       <div class="field">
-        <div class="hint" style="border-left:2px solid var(--verm-deep);padding-left:12px;">
-          Can spare a little more? <a href="{{ url_for('public.sponsor') }}">Sponsor a
-          letter (or several)</a> for someone who can't — ₹{{ cfg.SPONSOR_UNIT_PRICE }}
-          puts one more voice in the mailbag. Separate from your own letter above.
+        <div class="sponsor-callout">
+          <div>
+            <b>Can spare a little more?</b>
+            <p>Sponsor a letter for someone who can't — ₹{{ cfg.SPONSOR_UNIT_PRICE }}
+              puts one more voice in the mailbag. Separate from your own letter above.</p>
+          </div>
+          <a class="btn ghost btn-small" href="{{ url_for('public.sponsor') }}">
+            Sponsor a letter →</a>
         </div>
       </div>
 

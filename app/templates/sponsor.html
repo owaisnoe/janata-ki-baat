@@ -63,9 +63,25 @@
 <script>
 (function () {
   var UNIT = {{ unit_price }}, MAX = {{ max_qty }};
+  var opts = document.querySelectorAll(".sponsor-opt");
   var qtyInput = document.getElementById("sponsor-custom-qty");
   var radio = document.getElementById("sponsor-custom-radio");
   var total = document.getElementById("sponsor-custom-total");
+
+  // Mirror the selected radio onto the tile with a .checked class (matches the
+  // letter/tier pickers) so the highlight shows even without :has() support.
+  function paint() {
+    opts.forEach(function (o) {
+      var r = o.querySelector("input[type=radio]");
+      o.classList.toggle("checked", r && r.checked);
+    });
+  }
+  opts.forEach(function (o) {
+    var r = o.querySelector("input[type=radio]");
+    if (r) r.addEventListener("change", paint);
+  });
+  paint();
+
   if (!qtyInput) return;
   function sync() {
     radio.checked = true;
@@ -73,6 +89,7 @@
     if (isNaN(n) || n < 1) n = 1;
     if (n > MAX) { n = MAX; qtyInput.value = MAX; }
     total.textContent = "₹" + (n * UNIT).toLocaleString("en-IN");
+    paint();
   }
   qtyInput.addEventListener("input", sync);
   qtyInput.addEventListener("focus", sync);

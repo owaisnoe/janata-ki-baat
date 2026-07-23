@@ -180,6 +180,23 @@ section.band .step p { font-size: 15px; font-weight: 500; line-height: 1.6; colo
 .tier .brk { font-family:'IBM Plex Mono',monospace; font-size: 11.5px; color: var(--stone); margin: 6px 0 10px; }
 .tier p { font-size: 14.5px; font-weight: 500; line-height: 1.6; color: var(--ink-soft); margin: 0 0 16px; flex: 1; }
 
+/* sponsor picker: show which tile is selected (radios are visually hidden) */
+.sponsor-opt { transition: transform .12s ease, box-shadow .12s ease; }
+.sponsor-opt.checked, .sponsor-opt:has(input:checked) {
+  background: var(--paper-deep); border: 2px solid var(--verm-deep);
+  box-shadow: 5px 5px 0 var(--ink); }
+.sponsor-opt.checked h4, .sponsor-opt:has(input:checked) h4 { color: var(--verm-deep); }
+.sponsor-opt:focus-within { outline: 2px solid var(--verm-deep); outline-offset: 2px; }
+
+/* write-page "sponsor extra" callout — a notch louder than a plain hint */
+.sponsor-callout { display: flex; gap: 18px; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; background: var(--paper-deep); border-left: 3px solid var(--verm-deep);
+  border-radius: 3px; padding: 16px 18px; }
+.sponsor-callout b { font-family: 'Playfair Display', serif; font-size: 17px; color: var(--verm-deep); }
+.sponsor-callout p { font-size: 14.5px; line-height: 1.55; color: var(--ink-soft); margin: 4px 0 0; }
+.sponsor-callout .btn { white-space: nowrap; flex-shrink: 0; }
+@media (max-width: 520px) { .sponsor-callout .btn { width: 100%; text-align: center; } }
+
 /* --- mailbag / proof wall (dark band, v5) --- */
 .mailbag { background: var(--ink); color: var(--paper); padding: 56px 0; }
 .mailbag h3 { color: var(--paper); }

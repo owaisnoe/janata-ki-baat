@@ -3,6 +3,8 @@ order code in the transaction note; user submits the UTR; admin matches it
 against the UPI app. NPCI deprecated UPI Collect (Feb 2026) — QR and intent
 links are unaffected, which is why we build on those.
 """
+import hashlib
+import hmac
 import io
 from urllib.parse import quote
 
@@ -25,6 +27,47 @@ def qr_png(order):
     img.save(buf, format="PNG")
     buf.seek(0)
     return buf
+
+
+def razorpay_enabled():
+    cfg = current_app.config
+    return bool(cfg["RAZORPAY_KEY_ID"] and cfg["RAZORPAY_KEY_SECRET"])
+
+
+def create_razorpay_order(order):
+    """Create a Razorpay order for `order.total` (INR). Returns the Razorpay
+    order id, or raises requests.RequestException / ValueError on failure."""
+    cfg = current_app.config
+    amount_paise = order.total * 100
+    if amount_paise < 100:
+        raise ValueError("amount below Razorpay minimum (100 paise)")
+    resp = requests.post(
+        "https://api.razorpay.com/v1/orders",
+        auth=(cfg["RAZORPAY_KEY_ID"], cfg["RAZORPAY_KEY_SECRET"]),
+        json={
+            "amount": amount_paise,
+            "currency": "INR",
+            "receipt": order.public_code,
+            "notes": {"public_code": order.public_code},
+        },
+        timeout=10,
+    )
+    resp.raise_for_status()
+    return resp.json()["id"]
+
+
+def verify_razorpay_signature(razorpay_order_id, razorpay_payment_id, signature):
+    """True iff HMAC-SHA256(order_id|payment_id, KEY_SECRET) matches the
+    signature Razorpay sent. Constant-time compare."""
+    secret = current_app.config["RAZORPAY_KEY_SECRET"]
+    if not (secret and razorpay_order_id and razorpay_payment_id and signature):
+        return False
+    expected = hmac.new(
+        secret.encode(),
+        f"{razorpay_order_id}|{razorpay_payment_id}".encode(),
+        hashlib.sha256,
+    ).hexdigest()
+    return hmac.compare_digest(expected, signature)
 
 
 def verify_turnstile(token, remote_ip=None):

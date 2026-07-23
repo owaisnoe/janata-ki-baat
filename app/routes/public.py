@@ -7,6 +7,7 @@ from flask import (
     abort,
     current_app,
     flash,
+    jsonify,
     redirect,
     render_template,
     request,
@@ -222,7 +223,9 @@ def pay(code):
     if order.status in ("expired", "refunded"):
         return redirect(url_for("public.status", code=order.public_code))
     return render_template(
-        "pay.html", order=order, upi_uri=payments.upi_uri(order),
+        "pay.html", order=order,
+        upi_uri=payments.upi_uri(order) if current_app.config["UPI_VPA"] else None,
+        razorpay_enabled=payments.razorpay_enabled(),
         poster=(_posters() or [None])[0],
     )
 
@@ -262,6 +265,65 @@ def pay_utr(code):
     flash("Got it. We'll match your payment and confirm within a few hours.",
           "success")
     return redirect(url_for("public.status", code=order.public_code))
+
+
+@bp.post("/pay/<code>/razorpay/order")
+@limiter.limit("20 per hour")
+def razorpay_create_order(code):
+    """Create (or reuse) a Razorpay order for this letter and return the
+    details the browser needs to open Checkout. Secret never leaves here."""
+    if not payments.razorpay_enabled():
+        return jsonify(error="Card/UPI checkout is not available."), 503
+    order = _get_order(code)
+    if order.is_paid or order.status in ("expired", "refunded"):
+        return jsonify(error="This order can no longer be paid."), 409
+    try:
+        rzp_order_id = payments.create_razorpay_order(order)
+    except ValueError:
+        return jsonify(error="Invalid amount."), 400
+    except requests.RequestException:
+        current_app.logger.exception("Razorpay order create failed")
+        return jsonify(error="Payment gateway is unavailable. Try again."), 502
+    order.razorpay_order_id = rzp_order_id
+    db.session.commit()
+    return jsonify(
+        key_id=current_app.config["RAZORPAY_KEY_ID"],
+        order_id=rzp_order_id,
+        amount=order.total * 100,
+        currency="INR",
+        name="Janata Ki Baat",
+        description=f"Letter {order.public_code}",
+        prefill_email=order.email,
+        prefill_contact=order.phone or "",
+    )
+
+
+@bp.post("/pay/<code>/razorpay/verify")
+@limiter.limit("20 per hour")
+def razorpay_verify(code):
+    """Verify the signature Razorpay Checkout returned; confirm on match."""
+    order = _get_order(code)
+    if order.is_paid:
+        return jsonify(ok=True, redirect=url_for("public.status",
+                                                 code=order.public_code))
+    data = request.get_json(silent=True) or {}
+    rzp_order_id = data.get("razorpay_order_id")
+    payment_id = data.get("razorpay_payment_id")
+    signature = data.get("razorpay_signature")
+    if not (rzp_order_id and payment_id and signature):
+        return jsonify(error="Missing payment fields."), 400
+    # Guard against a signature for a different order being replayed here.
+    if rzp_order_id != order.razorpay_order_id:
+        return jsonify(error="Order mismatch."), 400
+    if not payments.verify_razorpay_signature(rzp_order_id, payment_id, signature):
+        return jsonify(error="Payment could not be verified."), 400
+
+    from ..services.orders import confirm_order
+    order.razorpay_payment_id = payment_id
+    order.utr = payment_id  # so the payment id shows in admin/status like a UTR
+    confirm_order(order)
+    return jsonify(ok=True, redirect=url_for("public.status",
+                                             code=order.public_code))
 
 
 @bp.get("/letter/<code>")

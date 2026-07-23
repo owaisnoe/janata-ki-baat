@@ -45,8 +45,27 @@ def create_app(config_class=Config):
 
     with app.app_context():
         db.create_all()
+        _ensure_columns()
         from .letter_templates import seed_templates
 
         seed_templates()
 
     return app
+
+
+def _ensure_columns():
+    """Add columns introduced after the table was first created.
+    create_all() never ALTERs an existing table, so on an already-live DB
+    (production MySQL) new nullable columns must be added explicitly. Safe to
+    run every boot — it only adds what's missing."""
+    from sqlalchemy import inspect, text
+
+    wanted = {
+        "razorpay_order_id": "VARCHAR(40)",
+        "razorpay_payment_id": "VARCHAR(40)",
+    }
+    existing = {c["name"] for c in inspect(db.engine).get_columns("orders")}
+    for name, ddl in wanted.items():
+        if name not in existing:
+            db.session.execute(text(f"ALTER TABLE orders ADD COLUMN {name} {ddl}"))
+    db.session.commit()

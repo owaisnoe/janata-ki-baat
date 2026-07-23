@@ -47,6 +47,9 @@ class Order(db.Model):
     status = db.Column(db.String(20), nullable=False, default="pending_payment",
                        index=True)
     utr = db.Column(db.String(40), nullable=True)
+    # Razorpay: order id created server-side, payment id returned on success.
+    razorpay_order_id = db.Column(db.String(40), nullable=True, index=True)
+    razorpay_payment_id = db.Column(db.String(40), nullable=True)
     tracking_no = db.Column(db.String(40), nullable=True)
     proof_filename = db.Column(db.String(120), nullable=True)
 

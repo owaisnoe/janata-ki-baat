@@ -118,34 +118,8 @@ def confirm(order_id):
     if order.status != "utr_submitted":
         flash("Order is not awaiting confirmation.", "error")
         return redirect(url_for("admin.queue"))
-    order.status = "confirmed"
-    order.confirmed_at = utcnow()
-    order.serial_no = next_serial()
-    from ..services.util import promised_post_date
-    order.promised_date = promised_post_date()
-    if order.sponsored_request:
-        tier_price = current_app.config["TIERS"][order.tier]["price"]
-        db.session.add(LedgerEntry(type="fund", amount=-tier_price,
-                                   order_ref=order.public_code,
-                                   note="sponsored letter (fund draw)"))
-    else:
-        db.session.add(LedgerEntry(type="fee", amount=order.amount,
-                                   order_ref=order.public_code,
-                                   note=f"{order.tier} fee"))
-        if order.tip:
-            db.session.add(LedgerEntry(type="tip", amount=order.tip,
-                                       order_ref=order.public_code,
-                                       note="chai for the volunteer"))
-    db.session.commit()
-
-    status_url = current_app.config["BASE_URL"] + url_for(
-        "public.status", code=order.public_code)
-    mailer.send_email(
-        order.email,
-        f"Payment confirmed — you are Letter #{order.serial_no:,}",
-        render_template("emails/payment_confirmed.html", order=order,
-                        status_url=status_url),
-    )
+    from ..services.orders import confirm_order
+    confirm_order(order)
     flash(f"{order.public_code} confirmed as Letter #{order.serial_no}.",
           "success")
     return redirect(url_for("admin.queue"))

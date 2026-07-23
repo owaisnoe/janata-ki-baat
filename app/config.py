@@ -22,6 +22,13 @@ class Config:
     UPI_VPA = os.environ.get("UPI_VPA", "")
     UPI_PAYEE_NAME = os.environ.get("UPI_PAYEE_NAME", "Janata Ki Baat")
 
+    # Razorpay Standard Checkout. When KEY_ID + KEY_SECRET are set, the pay
+    # page offers Razorpay (auto-confirms on verified signature). KEY_ID is
+    # exposed to the browser (public by design); KEY_SECRET is server-only and
+    # must never reach a template or JS. Falls back to manual UPI when unset.
+    RAZORPAY_KEY_ID = os.environ.get("RAZORPAY_KEY_ID", "")
+    RAZORPAY_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET", "")
+
     DAILY_CAP = int(os.environ.get("DAILY_CAP", "0"))  # 0 = uncapped
     BATCH_PACE = int(os.environ.get("BATCH_PACE", "50"))
 

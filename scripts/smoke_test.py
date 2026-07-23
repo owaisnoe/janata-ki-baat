@@ -19,6 +19,10 @@ TEST_DB.parent.mkdir(exist_ok=True)
 if TEST_DB.exists():
     TEST_DB.unlink()
 os.environ["DATABASE_URL"] = f"sqlite:///{TEST_DB.as_posix()}"
+# Exercise both payment paths: manual UPI + Razorpay auto-confirm.
+os.environ.setdefault("UPI_VPA", "test@upi")
+os.environ.setdefault("RAZORPAY_KEY_ID", "rzp_test_smoke")
+os.environ.setdefault("RAZORPAY_KEY_SECRET", "smoke_secret")
 
 from app import create_app  # noqa: E402
 from app.extensions import db  # noqa: E402
@@ -108,8 +112,24 @@ def main():
           and code.encode() in r.data)
     check("stamp-frame QR", b"stamp-frame" in r.data)
     check("share moment on pay", b"Tell one person" in r.data)
+    check("razorpay button on pay", b"rzp-pay-btn" in r.data
+          and b"checkout.razorpay.com" in r.data)
+    check("razorpay secret not leaked", b"smoke_secret" not in r.data)
     r = client.get(f"/pay/{code}/qr.png")
     check("UPI QR", r.status_code == 200 and r.data[:8] == b"\x89PNG\r\n\x1a\n")
+
+    # --- Razorpay verify path (mocked order create + real signature) ---
+    with app.app_context():
+        rz = db.session.get(Order, order_id)
+        rz.razorpay_order_id = "order_SMOKE"
+        db.session.commit()
+    r = client.post(f"/pay/{code}/razorpay/verify", json={
+        "razorpay_order_id": "order_SMOKE", "razorpay_payment_id": "pay_SMOKE",
+        "razorpay_signature": "TAMPERED"})
+    check("razorpay verify rejects bad signature", r.status_code == 400)
+    with app.app_context():
+        check("razorpay bad-sig leaves order unpaid",
+              db.session.get(Order, order_id).status == "pending_payment")
 
     r = client.post(f"/pay/{code}/utr", data={"utr": "415023998877"})
     check("UTR submit", r.status_code == 302)

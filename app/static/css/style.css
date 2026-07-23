@@ -34,6 +34,8 @@ a { color: var(--verm-deep); }
 .mast .over .star { color: var(--ink); }
 .mast h1 { font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(40px, 8vw, 76px);
   margin: 6px 0 4px; }
+.mast-home { color: var(--ink); text-decoration: none; border: 0; }
+.mast-home:hover { color: var(--verm-deep); }
 .mast .under { font-family:'IBM Plex Mono',monospace; font-size: 11px; letter-spacing: .26em; color: var(--ink-soft); }
 .ornament { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 14px; }
 .ornament .line { height: 1px; background: var(--hair); flex: 0 1 180px; }

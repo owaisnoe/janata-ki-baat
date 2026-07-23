@@ -19,6 +19,7 @@ from flask import (
 
 from ..extensions import db, limiter
 from ..models import LedgerEntry, Order, Sponsorship, WaitlistEntry, utcnow
+from ..responses import send_inline_bytes
 from ..services import mailer, pdf
 from ..services.util import fund_balance, next_serial, release_slot
 
@@ -199,8 +200,9 @@ def print_run():
         order.status = "printed"
     db.session.commit()
     stamp = utcnow().strftime("%Y%m%d-%H%M")
-    return send_file(buf, mimetype="application/pdf", as_attachment=True,
-                     download_name=f"print-run-{stamp}-{len(orders)}-letters.pdf")
+    return send_inline_bytes(
+        buf, "application/pdf", as_attachment=True,
+        download_name=f"print-run-{stamp}-{len(orders)}-letters.pdf")
 
 
 @bp.post("/order/<int:order_id>/posted")
@@ -300,5 +302,5 @@ def export_csv():
     for o in Order.query.order_by(Order.id).all():
         writer.writerow([getattr(o, c) for c in cols])
     out = io.BytesIO(buf.getvalue().encode("utf-8"))
-    return send_file(out, mimetype="text/csv", as_attachment=True,
-                     download_name="jkb-orders.csv")
+    return send_inline_bytes(out, "text/csv", as_attachment=True,
+                             download_name="jkb-orders.csv")

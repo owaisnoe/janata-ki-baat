@@ -16,6 +16,7 @@ from flask import (
 )
 
 from ..extensions import db, limiter
+from ..responses import send_inline_bytes
 from ..models import LedgerEntry, LetterTemplate, Order, WaitlistEntry
 from ..moderation import PERSONAL_PARA_MAX, check_personal_para
 from ..services import mailer, payments, pdf, sharecard
@@ -212,7 +213,8 @@ def preview_pdf():
         values["personal_para"],
         values["reply_address"],
     )
-    return send_file(buf, mimetype="application/pdf", download_name="letter-preview.pdf")
+    return send_inline_bytes(buf, "application/pdf",
+                             download_name="letter-preview.pdf")
 
 
 @bp.get("/pay/<code>")
@@ -233,7 +235,7 @@ def pay(code):
 @bp.get("/pay/<code>/qr.png")
 def pay_qr(code):
     order = _get_order(code)
-    return send_file(payments.qr_png(order), mimetype="image/png")
+    return send_inline_bytes(payments.qr_png(order), "image/png")
 
 
 @bp.get("/posters/<poster_id>.png")
@@ -339,8 +341,8 @@ def letter_pdf_route(code):
     order = _get_order(code)
     buf = pdf.letter_pdf(order.template, order.name, order.city,
                          order.personal_para, order.reply_address)
-    return send_file(buf, mimetype="application/pdf",
-                     download_name=f"{order.public_code}-letter.pdf")
+    return send_inline_bytes(buf, "application/pdf",
+                             download_name=f"{order.public_code}-letter.pdf")
 
 
 @bp.get("/letter/<code>/card.png")
@@ -380,8 +382,8 @@ def diy():
 @bp.get("/diy/kit.pdf")
 def diy_kit():
     templates = LetterTemplate.query.filter_by(active=True).all()
-    return send_file(pdf.diy_kit_pdf(templates), mimetype="application/pdf",
-                     download_name="janata-ki-baat-diy-kit.pdf")
+    return send_inline_bytes(pdf.diy_kit_pdf(templates), "application/pdf",
+                             download_name="janata-ki-baat-diy-kit.pdf")
 
 
 @bp.post("/waitlist")
@@ -472,7 +474,7 @@ def sponsor_pay(code):
 
 @bp.get("/sponsor/pay/<code>/qr.png")
 def sponsor_qr(code):
-    return send_file(payments.qr_png(_get_sponsorship(code)), mimetype="image/png")
+    return send_inline_bytes(payments.qr_png(_get_sponsorship(code)), "image/png")
 
 
 @bp.post("/sponsor/pay/<code>/utr")

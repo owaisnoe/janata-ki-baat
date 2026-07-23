@@ -132,6 +132,8 @@ class Sponsorship(db.Model):
     amount = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String(20), nullable=False, default="pending_payment")
     utr = db.Column(db.String(40), nullable=True)
+    razorpay_order_id = db.Column(db.String(40), nullable=True, index=True)
+    razorpay_payment_id = db.Column(db.String(40), nullable=True)
     created_at = db.Column(db.DateTime, nullable=False, default=utcnow)
     utr_at = db.Column(db.DateTime, nullable=True)
     confirmed_at = db.Column(db.DateTime, nullable=True)

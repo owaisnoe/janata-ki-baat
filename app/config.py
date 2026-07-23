@@ -79,6 +79,9 @@ class Config:
     }
     TIP_MAX = 500
 
+    # Sponsorship is a flat per-letter price; bundles are just presets.
+    SPONSOR_UNIT_PRICE = 59
+    SPONSOR_MAX_QTY = 100
     SPONSOR_BUNDLES = [(1, 59), (3, 177), (5, 295), (10, 590)]
 
     # SLA (plan §9)

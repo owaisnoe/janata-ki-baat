@@ -107,6 +107,14 @@
       </div>
 
       <div class="field">
+        <div class="hint" style="border-left:2px solid var(--verm-deep);padding-left:12px;">
+          Can spare a little more? <a href="{{ url_for('public.sponsor') }}">Sponsor a
+          letter (or several)</a> for someone who can't — ₹{{ cfg.SPONSOR_UNIT_PRICE }}
+          puts one more voice in the mailbag. Separate from your own letter above.
+        </div>
+      </div>
+
+      <div class="field">
         <label>Add a chai for the volunteer (optional)</label>
         <div class="chips" id="tip-chips">
           {% for amt, lbl in [(0, "no chai"), (10, "cutting chai"), (20, "chai + Parle-G"), (50, "full tiffin")] %}

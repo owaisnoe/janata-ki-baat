@@ -8,7 +8,7 @@
     {{ art.seal("₹59", "SPONSOR A LETTER") }}
     <div class="txt">
       <h1 style="margin-top:0">Post someone else's anger.</h1>
-      <p>Not everyone who wants on the record can spare ₹59 — hostel months are long. Sponsor one letter or five; every rupee sits in the public Letters Fund, every sponsored letter lands on the ledger.</p>
+      <p>Not everyone who wants on the record can spare ₹{{ unit_price }} — hostel months are long. Sponsor one letter or a hundred; every rupee sits in the public Letters Fund, every sponsored letter lands on the ledger.</p>
       <p class="mono" style="font-size:13px;">₹{{ "%.2f"|format(fund) }} in the fund · {{ sponsored }} letter{{ 's' if sponsored != 1 else '' }} sponsored so far.</p>
     </div>
   </div>
@@ -19,10 +19,10 @@
       <input type="email" name="email" required maxlength="254" placeholder="you@example.com">
     </div>
     <div class="field">
-      <label>Choose a bundle</label>
+      <label>Choose how many letters to sponsor</label>
       <div class="tiers" style="margin-top:8px;">
         {% for qty, price in bundles %}
-        <label class="tier" style="cursor:pointer;position:relative;">
+        <label class="tier sponsor-opt" style="cursor:pointer;position:relative;">
           <input type="radio" name="bundle" value="{{ qty }}"
                  {% if qty == 1 %}checked{% endif %}
                  style="position:absolute;opacity:0;width:0;height:0;">
@@ -31,6 +31,16 @@
           <div class="brk">₹{{ price // qty }} per letter</div>
         </label>
         {% endfor %}
+        <label class="tier sponsor-opt" style="cursor:pointer;position:relative;">
+          <input type="radio" name="bundle" value="custom" id="sponsor-custom-radio"
+                 style="position:absolute;opacity:0;width:0;height:0;">
+          <h4>Any number</h4>
+          <input type="number" id="sponsor-custom-qty" name="qty_custom"
+                 min="1" max="{{ max_qty }}" step="1" placeholder="e.g. 25"
+                 style="width:100%;margin:4px 0;">
+          <div class="brk"><span id="sponsor-custom-total">₹{{ unit_price }}</span>
+            · ₹{{ unit_price }} per letter</div>
+        </label>
       </div>
     </div>
     <button class="btn verm" type="submit">Sponsor letters →</button>
@@ -48,3 +58,25 @@
   </div>
 </section>
 {% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  var UNIT = {{ unit_price }}, MAX = {{ max_qty }};
+  var qtyInput = document.getElementById("sponsor-custom-qty");
+  var radio = document.getElementById("sponsor-custom-radio");
+  var total = document.getElementById("sponsor-custom-total");
+  if (!qtyInput) return;
+  function sync() {
+    radio.checked = true;
+    var n = parseInt(qtyInput.value, 10);
+    if (isNaN(n) || n < 1) n = 1;
+    if (n > MAX) { n = MAX; qtyInput.value = MAX; }
+    total.textContent = "₹" + (n * UNIT).toLocaleString("en-IN");
+  }
+  qtyInput.addEventListener("input", sync);
+  qtyInput.addEventListener("focus", sync);
+})();
+</script>
+{% endblock %}
+

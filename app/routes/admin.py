@@ -133,15 +133,8 @@ def sponsor_confirm(s_id):
     if s is None or s.status != "utr_submitted":
         flash("Sponsorship not awaiting confirmation.", "error")
         return redirect(url_for("admin.queue", tab="sponsor"))
-    s.status, s.confirmed_at = "confirmed", utcnow()
-    db.session.add(LedgerEntry(type="fund", amount=s.amount,
-                               order_ref=s.public_code,
-                               note=f"sponsored {s.bundle_qty} letter(s)"))
-    db.session.commit()
-    mailer.send_email(
-        s.email, f"Receipt — you sponsored {s.bundle_qty} letter(s)",
-        render_template("emails/sponsor_receipt.html", s=s),
-    )
+    from ..services.orders import confirm_sponsorship
+    confirm_sponsorship(s)
     flash(f"{s.public_code} confirmed — ₹{s.amount} into the Letters Fund.", "success")
     return redirect(url_for("admin.queue", tab="sponsor"))
 

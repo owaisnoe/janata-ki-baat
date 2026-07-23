@@ -432,8 +432,11 @@ def sponsor():
     from ..services.util import fund_balance
     sponsored = Sponsorship.query.filter_by(status="confirmed").with_entities(
         db.func.sum(Sponsorship.bundle_qty)).scalar() or 0
-    return render_template("sponsor.html", bundles=current_app.config["SPONSOR_BUNDLES"],
-                           fund=fund_balance(), sponsored=sponsored)
+    return render_template(
+        "sponsor.html", bundles=current_app.config["SPONSOR_BUNDLES"],
+        unit_price=current_app.config["SPONSOR_UNIT_PRICE"],
+        max_qty=current_app.config["SPONSOR_MAX_QTY"],
+        fund=fund_balance(), sponsored=sponsored)
 
 
 @bp.post("/sponsor")
@@ -444,15 +447,19 @@ def sponsor_create():
     if not EMAIL_RE.match(email):
         flash("A working email, please — that's where your receipt goes.", "error")
         return redirect(url_for("public.sponsor"))
-    bundles = dict(current_app.config["SPONSOR_BUNDLES"])
+    unit = current_app.config["SPONSOR_UNIT_PRICE"]
+    max_qty = current_app.config["SPONSOR_MAX_QTY"]
+    # "bundle" carries a preset qty; "qty_custom" (if the custom option was
+    # chosen) overrides it. Flat per-letter price, so amount = qty * unit.
+    raw = request.form.get("qty_custom") if request.form.get("bundle") == "custom" \
+        else request.form.get("bundle", "1")
     try:
-        qty = int(request.form.get("bundle", "1"))
-    except ValueError:
+        qty = int(raw)
+    except (ValueError, TypeError):
         qty = 1
-    if qty not in bundles:
-        qty = 1
+    qty = max(1, min(qty, max_qty))
     s = Sponsorship(public_code=gen_public_code("JKS-", Sponsorship),
-                    email=email, bundle_qty=qty, amount=bundles[qty])
+                    email=email, bundle_qty=qty, amount=qty * unit)
     db.session.add(s)
     db.session.commit()
     return redirect(url_for("public.sponsor_pay", code=s.public_code))
@@ -469,7 +476,10 @@ def _get_sponsorship(code):
 @bp.get("/sponsor/pay/<code>")
 def sponsor_pay(code):
     s = _get_sponsorship(code)
-    return render_template("sponsor_pay.html", s=s, upi_uri=payments.upi_uri(s))
+    return render_template(
+        "sponsor_pay.html", s=s,
+        upi_uri=payments.upi_uri(s) if current_app.config["UPI_VPA"] else None,
+        razorpay_enabled=payments.razorpay_enabled())
 
 
 @bp.get("/sponsor/pay/<code>/qr.png")
@@ -493,3 +503,50 @@ def sponsor_utr(code):
     db.session.commit()
     flash("Got it — we'll match your payment and email your receipt.", "success")
     return redirect(url_for("public.sponsor"))
+
+
+@bp.post("/sponsor/pay/<code>/razorpay/order")
+@limiter.limit("20 per hour")
+def sponsor_razorpay_create(code):
+    if not payments.razorpay_enabled():
+        return jsonify(error="Card/UPI checkout is not available."), 503
+    s = _get_sponsorship(code)
+    if s.status not in ("pending_payment", "utr_submitted"):
+        return jsonify(error="This sponsorship has already been processed."), 409
+    try:
+        rzp_order_id = payments.create_razorpay_order(s)
+    except ValueError:
+        return jsonify(error="Invalid amount."), 400
+    except requests.RequestException:
+        current_app.logger.exception("Razorpay sponsor order create failed")
+        return jsonify(error="Payment gateway is unavailable. Try again."), 502
+    s.razorpay_order_id = rzp_order_id
+    db.session.commit()
+    return jsonify(
+        key_id=current_app.config["RAZORPAY_KEY_ID"], order_id=rzp_order_id,
+        amount=s.amount * 100, currency="INR", name="Janata Ki Baat",
+        description=f"Sponsor {s.bundle_qty} letter(s) — {s.public_code}",
+        prefill_email=s.email, prefill_contact="")
+
+
+@bp.post("/sponsor/pay/<code>/razorpay/verify")
+@limiter.limit("20 per hour")
+def sponsor_razorpay_verify(code):
+    s = _get_sponsorship(code)
+    if s.status == "confirmed":
+        return jsonify(ok=True, redirect=url_for("public.sponsor"))
+    data = request.get_json(silent=True) or {}
+    rzp_order_id = data.get("razorpay_order_id")
+    payment_id = data.get("razorpay_payment_id")
+    signature = data.get("razorpay_signature")
+    if not (rzp_order_id and payment_id and signature):
+        return jsonify(error="Missing payment fields."), 400
+    if rzp_order_id != s.razorpay_order_id:
+        return jsonify(error="Order mismatch."), 400
+    if not payments.verify_razorpay_signature(rzp_order_id, payment_id, signature):
+        return jsonify(error="Payment could not be verified."), 400
+    from ..services.orders import confirm_sponsorship
+    s.razorpay_payment_id = payment_id
+    s.utr = payment_id
+    confirm_sponsorship(s)
+    return jsonify(ok=True, redirect=url_for("public.sponsor"))

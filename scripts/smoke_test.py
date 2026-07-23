@@ -279,6 +279,29 @@ def main():
     mails = list(outbox.glob("*.html")) if outbox.exists() else []
     check("sponsor receipt sent", any("receipt" in m.name for m in mails))
 
+    # --- sponsor: custom quantity + Razorpay reject path ---
+    r = client.post("/sponsor", data={"email": "custom@example.com",
+                                      "bundle": "custom", "qty_custom": "7"})
+    ccode = r.headers["Location"].rstrip("/").split("/")[-1]
+    with app.app_context():
+        from app.models import Sponsorship
+        cs = Sponsorship.query.filter_by(public_code=ccode).first()
+        check("sponsor custom qty priced flat", cs.bundle_qty == 7
+              and cs.amount == 7 * app.config["SPONSOR_UNIT_PRICE"])
+        cs.razorpay_order_id = "order_SPSMOKE"
+        db.session.commit()
+    r = client.get(f"/sponsor/pay/{ccode}")
+    check("sponsor pay razorpay button", b"rzp-pay-btn" in r.data
+          and b"smoke_secret" not in r.data)
+    r = client.post(f"/sponsor/pay/{ccode}/razorpay/verify", json={
+        "razorpay_order_id": "order_SPSMOKE", "razorpay_payment_id": "p",
+        "razorpay_signature": "TAMPERED"})
+    check("sponsor razorpay rejects bad signature", r.status_code == 400)
+    with app.app_context():
+        check("sponsor bad-sig leaves it unpaid",
+              Sponsorship.query.filter_by(public_code=ccode).first().status
+              == "pending_payment")
+
     # --- can't-pay sponsored request ---
     form_sp = dict(form, email="hostel@example.com", personal_para="",
                    cant_pay="on")

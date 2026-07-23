@@ -60,12 +60,21 @@ def _ensure_columns():
     run every boot — it only adds what's missing."""
     from sqlalchemy import inspect, text
 
-    wanted = {
-        "razorpay_order_id": "VARCHAR(40)",
-        "razorpay_payment_id": "VARCHAR(40)",
+    per_table = {
+        "orders": {
+            "razorpay_order_id": "VARCHAR(40)",
+            "razorpay_payment_id": "VARCHAR(40)",
+        },
+        "sponsorships": {
+            "razorpay_order_id": "VARCHAR(40)",
+            "razorpay_payment_id": "VARCHAR(40)",
+        },
     }
-    existing = {c["name"] for c in inspect(db.engine).get_columns("orders")}
-    for name, ddl in wanted.items():
-        if name not in existing:
-            db.session.execute(text(f"ALTER TABLE orders ADD COLUMN {name} {ddl}"))
+    insp = inspect(db.engine)
+    for table, wanted in per_table.items():
+        existing = {c["name"] for c in insp.get_columns(table)}
+        for name, ddl in wanted.items():
+            if name not in existing:
+                db.session.execute(
+                    text(f"ALTER TABLE {table} ADD COLUMN {name} {ddl}"))
     db.session.commit()

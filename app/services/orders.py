@@ -48,3 +48,21 @@ def confirm_order(order):
                         status_url=status_url),
     )
     return True
+
+
+def confirm_sponsorship(s):
+    """Mark a paid sponsorship confirmed: money into the Letters Fund + receipt
+    email. Idempotent — a replayed Razorpay callback is a no-op. Caller commits
+    (the ledger add is committed here so fund_balance reflects it immediately)."""
+    if s.status not in ("pending_payment", "utr_submitted"):
+        return False
+    s.status, s.confirmed_at = "confirmed", utcnow()
+    db.session.add(LedgerEntry(type="fund", amount=s.amount,
+                               order_ref=s.public_code,
+                               note=f"sponsored {s.bundle_qty} letter(s)"))
+    db.session.commit()
+    mailer.send_email(
+        s.email, f"Receipt — you sponsored {s.bundle_qty} letter(s)",
+        render_template("emails/sponsor_receipt.html", s=s),
+    )
+    return True

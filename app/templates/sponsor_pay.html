@@ -8,26 +8,42 @@
   <p class="small">Sponsorship <span class="slip">{{ s.public_code }}</span> ·
     {{ s.bundle_qty }} letter{{ 's' if s.bundle_qty != 1 else '' }} · unpaid sponsorships expire in 24 hours.</p>
 
+  {% if razorpay_enabled %}
+  <div class="pay-box" style="margin-top:26px">
+    <div>
+      <h3 style="margin-top:0">Pay securely</h3>
+      <p class="small">Card, UPI, net-banking or wallet. Your receipt emails
+        the instant it clears — nothing to copy.</p>
+      <button class="btn verm" id="rzp-pay-btn"
+              data-code="{{ s.public_code }}">Sponsor — pay ₹{{ s.amount }} now →</button>
+      <p class="small" id="rzp-status" role="status" aria-live="polite"
+         style="margin-top:12px"></p>
+      <p class="small" style="margin-top:14px">Powered by Razorpay — your card
+        details never touch our servers.</p>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if upi_uri %}
   <div class="pay-box" style="margin-top:26px">
     <div>
       <div class="qr-frame stamp-frame">
         <img src="{{ url_for('public.sponsor_qr', code=s.public_code) }}"
              alt="UPI QR code for ₹{{ s.amount }}">
       </div>
-      <p class="small mono center" style="margin-top:10px">SCAN WITH ANY UPI APP</p>
+      <p class="small mono center" style="margin-top:10px">
+        {% if razorpay_enabled %}OR PAY BY UPI DIRECTLY{% else %}SCAN WITH ANY UPI APP{% endif %}</p>
       <a class="btn btn-small" href="{{ upi_uri }}" id="upi-intent">Open UPI app →</a>
     </div>
-
     <div>
       <ol class="pay-steps">
         <li>Scan the QR (or tap the button on your phone). Amount:
           <strong>₹{{ s.amount }}</strong> exactly.</li>
         <li>Keep <span class="slip">{{ s.public_code }}</span> in the
           payment note — it's how we match you.</li>
-        <li>After paying, your UPI app shows a 12-digit
-          <strong>UTR / reference number</strong>. Paste it below.</li>
+        <li>After paying, paste the 12-digit <strong>UTR / reference
+          number</strong> below.</li>
       </ol>
-
       <form method="post" class="form-grid"
             action="{{ url_for('public.sponsor_utr', code=s.public_code) }}">
         <div class="field">
@@ -40,11 +56,65 @@
         </div>
         <button class="btn" type="submit">I've paid — verify me →</button>
       </form>
-      <p class="small">We match it by hand against our UPI app and confirm
-        within a few hours. You'll get a receipt email. Questions?
-        Write to {{ cfg.OPERATOR_CONTACT }}.</p>
+      <p class="small">Matched by hand within a few hours; receipt emailed.
+        Questions? Write to {{ cfg.OPERATOR_CONTACT }}.</p>
     </div>
   </div>
+  {% endif %}
 </section>
 
 {% endblock %}
+
+{% if razorpay_enabled %}
+{% block scripts %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+(function () {
+  var btn = document.getElementById("rzp-pay-btn");
+  var statusEl = document.getElementById("rzp-status");
+  if (!btn) return;
+  var code = btn.dataset.code;
+  function say(msg, isError) {
+    statusEl.textContent = msg;
+    statusEl.style.color = isError ? "var(--verm-deep)" : "";
+  }
+  btn.addEventListener("click", function () {
+    btn.disabled = true;
+    say("Setting up secure payment…", false);
+    fetch("/sponsor/pay/" + code + "/razorpay/order", { method: "POST" })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (res) {
+        if (!res.ok) { throw new Error(res.d.error || "Could not start payment."); }
+        var d = res.d;
+        var rzp = new Razorpay({
+          key: d.key_id, order_id: d.order_id, amount: d.amount,
+          currency: d.currency, name: d.name, description: d.description,
+          prefill: { email: d.prefill_email }, theme: { color: "#e2452f" },
+          handler: function (resp) {
+            say("Verifying payment…", false);
+            fetch("/sponsor/pay/" + code + "/razorpay/verify", {
+              method: "POST", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(resp)
+            })
+              .then(function (r) { return r.json(); })
+              .then(function (v) {
+                if (v.ok) { window.location.href = v.redirect; }
+                else { say(v.error || "Verification failed. Write to us before paying again.", true); btn.disabled = false; }
+              })
+              .catch(function () { say("Network error while verifying. Do not pay again — write to us with your payment id.", true); btn.disabled = false; });
+          },
+          modal: { ondismiss: function () { say("Payment cancelled. You can try again.", false); btn.disabled = false; } }
+        });
+        rzp.on("payment.failed", function (resp) {
+          say((resp.error && resp.error.description) || "Payment failed. Try again.", true);
+          btn.disabled = false;
+        });
+        say("", false);
+        rzp.open();
+      })
+      .catch(function (e) { say(e.message, true); btn.disabled = false; });
+  });
+})();
+</script>
+{% endblock %}
+{% endif %}

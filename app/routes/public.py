@@ -357,6 +357,11 @@ def refunds():
     return render_template("pages/refunds.html")
 
 
+@bp.get("/terms")
+def terms():
+    return render_template("pages/terms.html")
+
+
 @bp.get("/sponsor")
 def sponsor():
     from ..models import Sponsorship

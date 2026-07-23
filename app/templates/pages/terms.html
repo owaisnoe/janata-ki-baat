@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Terms &amp; Conditions — Janata Ki Baat{% endblock %}
+{% block content %}
+<section class="section" style="max-width:820px">
+  <div class="kicker">TERMS &amp; CONDITIONS — PLAIN ENGLISH</div>
+  <h1 style="margin-top:0">The deal, in writing.</h1>
+  <p>By using Janata Ki Baat you agree to these terms. We've kept them
+  short and honest. If anything here is unclear, write to
+  {{ cfg.OPERATOR_CONTACT }} before you pay.</p>
+
+  <h3>1. What the service is</h3>
+  <p>Janata Ki Baat prints a formal letter you choose, posts it by physical
+  mail to the relevant government office, photographs the sealed envelope at
+  the post-office counter, and gives you the tracking number. The service is
+  the printing and postage of a letter — nothing more is promised.</p>
+
+  <h3>2. What we don't promise</h3>
+  <ul>
+    <li>We cannot promise a reply from any government office, or any
+      particular outcome. We deliver a posted letter and its proof.</li>
+    <li>We are not affiliated with any government body, political party, or
+      movement, and we do not act on their behalf.</li>
+    <li>Postal delivery timelines are India Post's, not ours.</li>
+  </ul>
+
+  <h3>3. Your content</h3>
+  <p>You are responsible for what you ask us to print. Your personal
+  paragraph is screened against our
+  <a href="{{ url_for('public.content_policy') }}">content policy</a>. We may
+  refuse or refund any order containing unlawful, hateful, threatening, or
+  defamatory content, or content impersonating another person. You confirm
+  the details you submit are truthful and yours to send.</p>
+
+  <h3>4. Fees &amp; payment</h3>
+  <p>Fees are service charges for printing and postage, shown before you pay
+  and itemised on the <a href="{{ url_for('public.ledger') }}">public
+  ledger</a>. Fees are <strong>not donations</strong> and are never passed to
+  any political party or campaign. Payment is collected via UPI through our
+  payment provider; we do not store your card or bank credentials.</p>
+
+  <h3>5. Refunds &amp; cancellation</h3>
+  <p>You can cancel for a full refund any time before your letter is printed.
+  Once posted, the postage is spent and cannot be refunded — but our posting
+  promise and refund SLA are set out on the
+  <a href="{{ url_for('public.refunds') }}">Refunds &amp; SLA</a> page, which
+  forms part of these terms. If we fail to post within the promised window,
+  you get your money back per that SLA.</p>
+
+  <h3>6. Privacy</h3>
+  <p>We collect the minimum needed to print and post your letter and keep it
+  only as long as needed, as described in our
+  <a href="{{ url_for('public.privacy') }}">Privacy notice</a>.</p>
+
+  <h3>7. Liability</h3>
+  <p>Our responsibility is limited to delivering the posted letter and its
+  proof, or refunding you where we don't. We are not liable for how any
+  recipient responds, for postal delays outside our control, or for
+  consequences of the content you chose to send.</p>
+
+  <h3>8. Who runs this &amp; how to reach us</h3>
+  <p>Janata Ki Baat is a student-run service operated by
+  {% if cfg.OPERATOR_NAME %}<strong>{{ cfg.OPERATOR_NAME }}</strong>{% else %}its
+  named operator{% endif %}{% if cfg.OPERATOR_CITY %}, based in
+  {{ cfg.OPERATOR_CITY }}{% endif %}. Questions, grievances, and refund
+  requests: {{ cfg.OPERATOR_CONTACT }}, acknowledged within 48 hours. These
+  terms are governed by the laws of India.</p>
+</section>
+{% endblock %}
